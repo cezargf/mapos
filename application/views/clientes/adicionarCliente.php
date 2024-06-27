@@ -104,7 +104,9 @@
                                 <input id="nomeCliente" type="text" name="nomeCliente" value="<?php echo set_value('nomeCliente'); ?>" />
                             </div>
                         </div>
-                        <dev></div>
+                        <div>
+
+                        </div>
                         <div class="control-group">
                             <label for="contato" class="control-label">Contato:</label>
                             <div class="controls">

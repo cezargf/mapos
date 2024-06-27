@@ -10,6 +10,11 @@ $config = [
             'rules' => 'required|trim',
         ],
         [
+            'field' => 'fantasiaCliente',
+            'label' => 'Nome/Fantasia',
+            'rules' => 'trim',
+        ],
+        [
             'field' => 'documento',
             'label' => 'CPF/CNPJ',
             'rules' => 'trim|verific_cpf_cnpj|unique[clientes.documento.' . get_instance()->uri->segment(3) . '.idClientes]',

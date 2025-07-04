@@ -298,7 +298,7 @@ foreach ($produtos as $p) {
 <script type="text/javascript">
     
     $("#quantidade").keyup(function() {
-        this.value = this.value.replace(/[^0-9.]/g, '');
+        this.value = this.value.replace(/[^0-9,]/g, '');
     });
 
     function calcDesconto(valor, desconto, tipoDesconto) {
@@ -323,7 +323,7 @@ foreach ($produtos as $p) {
 
     $("#desconto").keyup(function() {
 
-        this.value = this.value.replace(/[^0-9.]/g, '');
+        this.value = this.value.replace(/[^0-9,]/g, '');
         if ($("#total-venda").val() == null || $("#total-venda").val() == '') {
             $('#errorAlert').text('Valor não pode ser apagado.').css("display", "inline").fadeOut(5000);
             $('#desconto').val('');

@@ -396,7 +396,10 @@ $config = [
         [
             'field' => 'quantidade',
             'label' => 'quantidade',
-            'rules' => 'trim|required|numeric|greater_than[0]',
+            'rules' => 'trim|required|decimal|greater_than[0.00]',
+            'errors' => [
+                'greater_than' => 'A quantidade deve ser maior que 0.00'
+            ],
         ],
         [
             'field' => 'preco',
@@ -419,6 +422,9 @@ $config = [
             'field' => 'quantidade',
             'label' => 'quantidade',
             'rules' => 'trim|required|numeric|greater_than[0]',
+            'errors' => [
+                'greater_than' => 'A quantidade deve ser maior que 0.00'
+            ],
         ],
         [
             'field' => 'preco',

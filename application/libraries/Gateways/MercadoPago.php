@@ -184,14 +184,14 @@ class MercadoPago extends BasePaymentGateway
         $totalProdutos = array_reduce(
             $produtos,
             function ($total, $item) {
-                return $total + (floatval($item->preco) * intval($item->quantidade));
+                return $total + (floatval($item->preco) * floatval($item->quantidade));
             },
             0
         );
         $totalServicos = array_reduce(
             $servicos,
             function ($total, $item) {
-                return $total + (floatval($item->preco) * intval($item->quantidade));
+                return $total + (floatval($item->preco) * floatval($item->quantidade));
             },
             0
         );

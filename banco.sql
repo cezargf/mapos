@@ -279,7 +279,7 @@ DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `produtos_os` (
   `idProdutos_os` INT(11) NOT NULL AUTO_INCREMENT,
-  `quantidade` INT(11) NOT NULL,
+  `quantidade` DOUBLE NOT NULL,
   `descricao` VARCHAR(80) NULL,
   `preco` DECIMAL(10,2) NULL DEFAULT 0,
   `os_id` INT(11) NOT NULL,
@@ -425,7 +425,7 @@ CREATE TABLE IF NOT EXISTS `cobrancas` (
 CREATE TABLE IF NOT EXISTS `itens_de_vendas` (
   `idItens` INT NOT NULL AUTO_INCREMENT,
   `subTotal` DECIMAL(10,2) NULL DEFAULT 0,
-  `quantidade` INT(11) NULL,
+  `quantidade` DOUBLE NULL,
   `preco` DECIMAL(10,2) NULL DEFAULT 0,
   `vendas_id` INT NOT NULL,
   `produtos_id` INT(11) NOT NULL,

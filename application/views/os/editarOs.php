@@ -578,11 +578,11 @@
     var valorBackup = $("#valorTotal").val();
 
     $("#quantidade").keyup(function () {
-        this.value = this.value.replace(/[^0-9.]/g, '');
+        this.value = this.value.replace(/[^0-9,]/g, '');
     });
 
     $("#quantidade_servico").keyup(function () {
-        this.value = this.value.replace(/[^0-9.]/g, '');
+        this.value = this.value.replace(/[^0-9,]/g, '');
     });
     $('#tipoDesconto').on('change', function () {
         if (Number($("#desconto").val()) >= 0) {
@@ -591,7 +591,7 @@
         }
     });
     $("#desconto").keyup(function () {
-        this.value = this.value.replace(/[^0-9.]/g, '');
+        this.value = this.value.replace(/[^0-9,]/g, '');
         if ($("#valorTotal").val() == null || $("#valorTotal").val() == '') {
             $('#errorAlert').text('Valor não pode ser apagado.').css("display", "inline").fadeOut(5000);
             $('#desconto').val('');
@@ -931,22 +931,29 @@
                 }
             },
             submitHandler: function (form) {
-                var quantidade = parseInt($("#quantidade").val());
-                var estoque = parseInt($("#estoque").val());
+                var quantidade = parseFloat($("#quantidade").val().replace(/\./g, "").replace(",", "."));
+                var estoque = parseFloat($("#estoque").val());
 
                 <?php if (!$configuration['control_estoque']) {
                     echo 'estoque = 1000000';
                 }
                 ; ?>
 
-                if (estoque < quantidade) {
+                if (estoque == 0 || estoque < quantidade) {
                     Swal.fire({
                         type: "error",
                         title: "Atenção",
                         text: "Você não possui estoque suficiente."
                     });
                 } else {
-                    var dados = $(form).serialize();
+                    var dados = {
+                        idProduto: $("#idProduto").val(),
+                        idOsProduto: $("#idOsProduto").val(),
+                        estoque: estoque,
+                        produto: $("#produto").val(),
+                        preco: $("#preco").val(),
+                        quantidade: quantidade.toFixed(2),
+                    };
                     $("#divProdutos").html("<div class='progress progress-info progress-striped active'><div class='bar' style='width: 100%'></div></div>");
                     $.ajax({
                         type: "POST",
@@ -968,6 +975,27 @@
                                     title: "Atenção",
                                     text: "Ocorreu um erro ao tentar adicionar produto."
                                 });
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            if (xhr.status === 400) {
+                                Swal.fire({
+                                    type:"error",
+                                    title: "Atenção",
+                                    html: xhr.responseJSON,
+                                });
+                                switch (xhr.responseJSON) {
+                                    case "<p>A quantidade deve ser maior que 0.00<\/p>\n":
+                                        $("#divProdutos").load("<?php echo current_url(); ?> #divProdutos");
+                                        $("#resultado").val('');
+                                        $("#desconto").val('');
+                                        $("#divValorTotal").load("<?php echo current_url(); ?> #divValorTotal");
+                                        $("#quantidade").val('').focus();
+                                        break;
+                                
+                                    default:
+                                        break;
+                                }
                             }
                         }
                     });
@@ -1000,7 +1028,14 @@
                 },
             },
             submitHandler: function (form) {
-                var dados = $(form).serialize();
+                var quantidade = parseFloat($("#quantidade_servico").val().replace(/\./g, "").replace(",", "."));
+                var dados = {
+                    idServico: $("#idServico").val(),
+                    idOsServico: $("#idOsServico").val(),
+                    servico: $("#servico").val(),
+                    preco: $("#preco_servico").val(),
+                    quantidade: quantidade.toFixed(2),
+                };
 
                 $("#divServicos").html("<div class='progress progress-info progress-striped active'><div class='bar' style='width: 100%'></div></div>");
                 $.ajax({
@@ -1023,6 +1058,26 @@
                                 title: "Atenção",
                                 text: "Ocorreu um erro ao tentar adicionar serviço."
                             });
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        if (xhr.status === 400) {
+                            Swal.fire({
+                                type: "error",
+                                title: "Atenção",
+                                html: xhr.responseJSON,
+                            });
+                            switch (xhr.responseJSON) {
+                                case "<p>A quantidade deve ser maior que 0.00<\/p>\n":
+                                    $("#divServicos").load("<?php echo current_url(); ?> #divServicos");
+                                    $("#resultado").val('');
+                                    $("#desconto").val('');
+                                    $("#divValorTotal").load("<?php echo current_url(); ?> #divValorTotal");
+                                    $("#quantidade").val('').focus();
+                                    break;
+                                default:
+                                    break;
+                            }
                         }
                     }
                 });

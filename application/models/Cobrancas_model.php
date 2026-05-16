@@ -40,12 +40,12 @@ class Cobrancas_model extends CI_Model
 
     public function getByOs($id)
     {
-        return $this->db->query("SELECT DISTINCT `cobrancas`.*,`clientes`.*,`os`.* FROM `cobrancas`,`clientes`,`os` WHERE `charge_id` = $id AND `os`.`idOs` = `cobrancas`.`os_id`")->row();
+        return $this->db->query("SELECT DISTINCT `cobrancas`.*,`clientes`.*,`os`.* FROM `cobrancas`,`clientes`,`os` WHERE `charge_id` = ? AND `os`.`idOs` = `cobrancas`.`os_id`", [$id])->row();
     }
 
     public function getByVendas($id)
     {
-        return $this->db->query("SELECT DISTINCT `cobrancas`.*,`clientes`.*,`vendas`.* FROM `cobrancas`,`clientes`,`vendas` WHERE `charge_id` = $id AND `vendas`.`idVendas` = `cobrancas`.`vendas_id`")->row();
+        return $this->db->query("SELECT DISTINCT `cobrancas`.*,`clientes`.*,`vendas`.* FROM `cobrancas`,`clientes`,`vendas` WHERE `charge_id` = ? AND `vendas`.`idVendas` = `cobrancas`.`vendas_id`", [$id])->row();
     }
 
     public function add($table, $data, $returnId = false)

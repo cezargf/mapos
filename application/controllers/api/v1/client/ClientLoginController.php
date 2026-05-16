@@ -32,9 +32,13 @@ class ClientLoginController extends REST_Controller
         $cliente = $this->check_credentials($email);
 
         if (!$cliente) {
+            // Simulate password_verify to mitigate timing attacks and username enumeration
+            $dummy_hash = '$2y$10$dummyhashdummyhashdummyhashdummyhashdummyhashdummyhas';
+            password_verify($password, $dummy_hash);
+
             $this->response([
                 'result' => false,
-                 'message' => 'Usuário não encontrado.'
+                 'message' => 'Os dados de acesso estão incorretos.'
                 ], REST_Controller::HTTP_UNAUTHORIZED);
             return;
         }

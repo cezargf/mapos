@@ -266,7 +266,11 @@ class Mine extends CI_Controller
                     echo json_encode(['result' => false, 'message' => 'Os dados de acesso estão incorretos.', 'MAPOS_TOKEN' => $this->security->get_csrf_hash()]);
                 }
             } else {
-                echo json_encode(['result' => false, 'message' => 'Usuário não encontrado, verifique se suas credenciais estão corretas.', 'MAPOS_TOKEN' => $this->security->get_csrf_hash()]);
+                // Simulate password_verify to mitigate timing attacks and username enumeration
+                $dummy_hash = '$2y$10$dummyhashdummyhashdummyhashdummyhashdummyhashdummyhas';
+                password_verify($password, $dummy_hash);
+
+                echo json_encode(['result' => false, 'message' => 'Os dados de acesso estão incorretos.', 'MAPOS_TOKEN' => $this->security->get_csrf_hash()]);
             }
         }
     }

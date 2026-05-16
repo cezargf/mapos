@@ -1,0 +1,5 @@
+
+## 2024-05-24 - Timing Attacks in Authentication
+**Vulnerability:** The login functions (for Admin, Connect/Clients, and APIs) were returning different messages for "User not found" and "Incorrect password". More importantly, they were executing `password_verify` only if the user was found. This introduces timing side-channels, as checking a non-existent user takes significantly less time than checking an existing user due to the heavy bcrypt operation. This allowed an attacker to enumerate usernames.
+**Learning:** To mitigate timing attacks, it's crucial that both success and failure paths take a roughly equivalent amount of time. If a user is not found, a dummy `password_verify` with a static hash should be executed to consume CPU time equivalent to checking a real password.
+**Prevention:** Always normalize error messages (e.g., "Invalid credentials") and ensure that computationally expensive operations like `password_verify` are performed unconditionally, using a dummy string/hash when the target is missing.

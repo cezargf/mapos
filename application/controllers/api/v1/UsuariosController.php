@@ -298,6 +298,10 @@ class UsuariosController extends REST_Controller
             ], REST_Controller::HTTP_UNAUTHORIZED);
         }
 
+        // Simulate password_verify to mitigate timing attacks and username enumeration
+        $dummy_hash = '$2y$10$dummyhashdummyhashdummyhashdummyhashdummyhashdummyhas';
+        password_verify($password, $dummy_hash);
+
         $this->response([
             'status' => false,
             'message' => 'Os dados de acesso estão incorretos!',
@@ -339,7 +343,7 @@ class UsuariosController extends REST_Controller
 
             $this->response([
                 'status' => false,
-                'message' => 'Usuário não encontrado, verifique se suas credenciais estão corretas!',
+                'message' => 'Os dados de acesso estão incorretos!',
             ], REST_Controller::HTTP_UNAUTHORIZED);
         }
 

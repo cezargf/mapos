@@ -298,6 +298,10 @@ class Os extends MY_Controller
         $this->load->model('mapos_model');
         $this->data['emitente'] = $this->mapos_model->getEmitente();
 
+        $this->data['zapnumber'] = preg_replace("/[^0-9]/", "", $this->data['result']->celular_cliente);
+        $troca = [$this->data['result']->nomeCliente, $this->data['result']->idOs, $this->data['result']->status, 'R$ ' . ($this->data['result']->desconto != 0 && $this->data['result']->valor_desconto != 0 ? number_format($this->data['result']->valor_desconto, 2, ',', '.') : number_format($this->data['totalProdutos'] + $this->data['totalServico'], 2, ',', '.')), strip_tags($this->data['result']->descricaoProduto), ($this->data['emitente'] ? $this->data['emitente']->nome : ''), ($this->data['emitente'] ? $this->data['emitente']->telefone : ''), strip_tags($this->data['result']->observacoes), strip_tags($this->data['result']->defeito), strip_tags($this->data['result']->laudoTecnico), date('d/m/Y', strtotime($this->data['result']->dataFinal)), date('d/m/Y', strtotime($this->data['result']->dataInicial)), $this->data['result']->garantia . ' dias'];
+        $this->data['texto_de_notificacao'] = $this->os_model->criarTextoWhats($this->data['texto_de_notificacao'], $troca);
+
         $this->data['view'] = 'os/editarOs';
 
         return $this->layout();
@@ -346,6 +350,10 @@ class Os extends MY_Controller
             $this->data['totalServico'] = $return['totalServico'];
             $this->data['totalProdutos'] = $return['totalProdutos'];
         }
+
+        $this->data['zapnumber'] = preg_replace("/[^0-9]/", "", $this->data['result']->celular_cliente);
+        $troca = [$this->data['result']->nomeCliente, $this->data['result']->idOs, $this->data['result']->status, 'R$ ' . ($this->data['result']->desconto != 0 && $this->data['result']->valor_desconto != 0 ? number_format($this->data['result']->valor_desconto, 2, ',', '.') : number_format((isset($this->data['totalProdutos']) ? $this->data['totalProdutos'] : 0) + (isset($this->data['totalServico']) ? $this->data['totalServico'] : 0), 2, ',', '.')), strip_tags($this->data['result']->descricaoProduto), ($this->data['emitente'] ? $this->data['emitente']->nome : ''), ($this->data['emitente'] ? $this->data['emitente']->telefone : ''), strip_tags($this->data['result']->observacoes), strip_tags($this->data['result']->defeito), strip_tags($this->data['result']->laudoTecnico), date('d/m/Y', strtotime($this->data['result']->dataFinal)), date('d/m/Y', strtotime($this->data['result']->dataInicial)), $this->data['result']->garantia . ' dias'];
+        $this->data['texto_de_notificacao'] = $this->os_model->criarTextoWhats($this->data['texto_de_notificacao'], $troca);
 
         return $this->layout();
     }

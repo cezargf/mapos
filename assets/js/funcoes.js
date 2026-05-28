@@ -5,7 +5,7 @@ $(function () {
     $('.cnpjEmitente').mask('00.000.000/0000-00', { reverse: true });
 });
 
-
+/* Funções de bloqueio de campos CPF/CNPJ para edição, após a instalação do sistema, para evitar que o usuário altere o CPF/CNPJ do cliente/emitente.
 $(function () {
     if ($('.cpfcnpjmine').val() != null) {
         if ($('.cpfcnpjmine').val() != "") {
@@ -20,6 +20,7 @@ $(function () {
     }
 
 });
+*/
 
 $(function () {
     var telefoneN = function (val) {

@@ -50,5 +50,7 @@ if (filter_var($_ENV['API_ENABLED'] ?? false, FILTER_VALIDATE_BOOLEAN)) {
     require APPPATH . 'config/routes_api.php';
 }
 
+$route['api/ibge/cidades/(:any)'] = 'Ibge/cidades/$1';
+
 /* End of file routes.php */
 /* Location: ./application/config/routes.php */

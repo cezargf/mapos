@@ -40,7 +40,10 @@ class MY_Controller extends CI_Controller
         parent::__construct();
 
         if ((! session_id()) || (! $this->session->userdata('logado'))) {
+            $allowed = ['login', 'mine', 'ibge'];
+            if (!in_array($this->router->class, $allowed)) {
             redirect('login');
+        }
         }
         $this->load_configuration();
     }

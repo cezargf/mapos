@@ -170,3 +170,118 @@ if (! function_exists('valid_pix_key')) {
         return false;
     }
 }
+
+if (! function_exists('valid_ie')) {
+    /**
+     * Valida Inscrição Estadual (IE)
+     * Aceita IE com ou sem formatação
+     * Formato: Varia por estado, geralmente de 10 a 14 dígitos
+     * 
+     * @param string $ie
+     * @return bool
+     */
+    function valid_ie($ie)
+    {
+        // Remove caracteres especiais
+        $ie = preg_replace('/[^0-9]/', '', $ie);
+
+        // IE deve ter entre 8 e 14 dígitos (varia conforme o estado)
+        if (strlen($ie) < 8 || strlen($ie) > 14) {
+            return false;
+        }
+
+        // Se for vazio após limpeza
+        if (empty($ie)) {
+            return false;
+        }
+
+        // Verifica se é uma sequência repetida
+        if (preg_match('/(\d)\1{' . (strlen($ie) - 1) . '}/', $ie)) {
+            return false;
+        }
+
+        return true;
+    }
+}
+
+if (! function_exists('valid_im')) {
+    /**
+     * Valida Inscrição Municipal (IM)
+     * Formato: Geralmente de 8 a 20 dígitos, conforme a prefeitura
+     * 
+     * @param string $im
+     * @return bool
+     */
+    function valid_im($im)
+    {
+        // Remove caracteres especiais
+        $im = preg_replace('/[^0-9]/', '', $im);
+
+        // IM deve ter entre 8 e 20 dígitos
+        if (strlen($im) < 5 || strlen($im) > 20) {
+            return false;
+        }
+
+        // Se for vazio após limpeza
+        if (empty($im)) {
+            return false;
+        }
+
+        // Verifica se é uma sequência repetida
+        if (preg_match('/(\d)\1{' . (strlen($im) - 1) . '}/', $im)) {
+            return false;
+        }
+
+        return true;
+    }
+}
+
+if (! function_exists('valid_ie_callback')) {
+    /**
+     * Callback para validação de IE no CodeIgniter Form Validation
+     * 
+     * @param string $ie
+     * @return bool
+     */
+    function valid_ie_callback($ie)
+    {
+        $CI = &get_instance();
+
+        if (empty($ie)) {
+            // IE é opcional, então vazio é válido
+            return true;
+        }
+
+        if (valid_ie($ie)) {
+            return true;
+        } else {
+            $CI->form_validation->set_message('valid_ie_callback', 'O campo %s deve conter entre 8 e 14 dígitos');
+            return false;
+        }
+    }
+}
+
+if (! function_exists('valid_im_callback')) {
+    /**
+     * Callback para validação de IM no CodeIgniter Form Validation
+     * 
+     * @param string $im
+     * @return bool
+     */
+    function valid_im_callback($im)
+    {
+        $CI = &get_instance();
+
+        if (empty($im)) {
+            // IM é opcional, então vazio é válido
+            return true;
+        }
+
+        if (valid_im($im)) {
+            return true;
+        } else {
+            $CI->form_validation->set_message('valid_im_callback', 'O campo %s deve conter entre 5 e 20 dígitos');
+            return false;
+        }
+    }
+}

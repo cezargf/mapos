@@ -382,37 +382,71 @@ class Mapos_model extends CI_Model
         return $this->db->get('emitente')->row();
     }
 
-    public function addEmitente($nome, $cnpj, $ie, $cep, $logradouro, $numero, $bairro, $cidade, $uf, $telefone, $email, $logo)
+    public function addEmitente($nome, $cnpj, $ie, $im, $cep, $logradouro, $numero, $complemento, $bairro, $cidade, $uf, $telefone, $email, $logo, $cnae = null, $atividade_principal = null, $situacao = null, $data_situacao = null, $data_abertura = null, $natureza_juridica = null, $porte = null, $capital_social = null, $qsa = null, $email_contador = null, $codigo_ibge = null, $numero_nfe = 0, $numero_nfce = 0, $latitude = null, $longitude = null)
     {
         $this->db->set('nome', $nome);
         $this->db->set('cnpj', $cnpj);
         $this->db->set('ie', $ie);
+        $this->db->set('im', $im);
         $this->db->set('cep', $cep);
+        $this->db->set('codigo_ibge', $codigo_ibge);
         $this->db->set('rua', $logradouro);
         $this->db->set('numero', $numero);
+        $this->db->set('complemento', $complemento);
         $this->db->set('bairro', $bairro);
         $this->db->set('cidade', $cidade);
         $this->db->set('uf', $uf);
         $this->db->set('telefone', $telefone);
         $this->db->set('email', $email);
+        $this->db->set('email_contador', $email_contador);
         $this->db->set('url_logo', $logo);
+        $this->db->set('cnae', $cnae);
+        $this->db->set('atividade_principal', $atividade_principal);
+        $this->db->set('situacao', $situacao);
+        $this->db->set('data_situacao', $data_situacao);
+        $this->db->set('data_abertura', $data_abertura);
+        $this->db->set('natureza_juridica', $natureza_juridica);
+        $this->db->set('porte', $porte);
+        $this->db->set('capital_social', $capital_social);
+        $this->db->set('qsa', $qsa);
+        $this->db->set('numero_nfe', $numero_nfe);
+        $this->db->set('numero_nfce', $numero_nfce);
+        $this->db->set('latitude', $latitude);
+        $this->db->set('longitude', $longitude);
 
         return $this->db->insert('emitente');
     }
 
-    public function editEmitente($id, $nome, $cnpj, $ie, $cep, $logradouro, $numero, $bairro, $cidade, $uf, $telefone, $email)
+    public function editEmitente($id, $nome, $cnpj, $ie, $im, $cep, $logradouro, $numero, $complemento, $bairro, $cidade, $uf, $telefone, $email, $cnae = null, $atividade_principal = null, $situacao = null, $data_situacao = null, $data_abertura = null, $natureza_juridica = null, $porte = null, $capital_social = null, $qsa = null, $email_contador = null, $codigo_ibge = null, $numero_nfe = 0, $numero_nfce = 0, $latitude = null, $longitude = null)
     {
         $this->db->set('nome', $nome);
         $this->db->set('cnpj', $cnpj);
         $this->db->set('ie', $ie);
+        $this->db->set('im', $im);
         $this->db->set('cep', $cep);
+        $this->db->set('codigo_ibge', $codigo_ibge);
         $this->db->set('rua', $logradouro);
         $this->db->set('numero', $numero);
+        $this->db->set('complemento', $complemento);
         $this->db->set('bairro', $bairro);
         $this->db->set('cidade', $cidade);
         $this->db->set('uf', $uf);
         $this->db->set('telefone', $telefone);
         $this->db->set('email', $email);
+        $this->db->set('email_contador', $email_contador);
+        $this->db->set('cnae', $cnae);
+        $this->db->set('atividade_principal', $atividade_principal);
+        $this->db->set('situacao', $situacao);
+        $this->db->set('data_situacao', $data_situacao);
+        $this->db->set('data_abertura', $data_abertura);
+        $this->db->set('natureza_juridica', $natureza_juridica);
+        $this->db->set('porte', $porte);
+        $this->db->set('capital_social', $capital_social);
+        $this->db->set('qsa', $qsa);
+        $this->db->set('numero_nfe', $numero_nfe);
+        $this->db->set('numero_nfce', $numero_nfce);
+        $this->db->set('latitude', $latitude);
+        $this->db->set('longitude', $longitude);
         $this->db->where('id', $id);
 
         return $this->db->update('emitente');

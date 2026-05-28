@@ -662,6 +662,8 @@
         $('input[name="telefone"]').mask("(00) 0000-0000");
         $('input[name="cnae"]').mask("0000-00");
         $('input[name="data_abertura"], input[name="data_situacao"]').mask("00/00/0000");
+        $('input[name="capital_social"]').mask("#.##0,00", { reverse: true });
+        $('input[name="ie"]').mask("000.000.000.000");
 
         const validationRules = {
             nome: { required: true },

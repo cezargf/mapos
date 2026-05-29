@@ -203,35 +203,8 @@ class Mapos extends MY_Controller
         }
 
         $this->load->library('form_validation');
-        $this->form_validation->set_rules('nome', 'Razão Social', 'required|trim');
-        $this->form_validation->set_rules('cnpj', 'CNPJ', 'required|trim');
-        $this->form_validation->set_rules('ie', 'IE', 'trim|callback_valid_ie_callback');
-        $this->form_validation->set_rules('im', 'IM', 'trim|callback_valid_im_callback');
-        $this->form_validation->set_rules('cep', 'CEP', 'required|trim');
-        $this->form_validation->set_rules('logradouro', 'Logradouro', 'required|trim');
-        $this->form_validation->set_rules('numero', 'Número', 'required|trim');
-        $this->form_validation->set_rules('complemento', 'Complemento', 'trim');
-        $this->form_validation->set_rules('bairro', 'Bairro', 'required|trim');
-        $this->form_validation->set_rules('cidade', 'Cidade', 'required|trim');
-        $this->form_validation->set_rules('uf', 'UF', 'required|trim');
-        $this->form_validation->set_rules('telefone', 'Telefone', 'required|trim');
-        $this->form_validation->set_rules('email', 'E-mail', 'required|trim');
-        $this->form_validation->set_rules('email_contador', 'E-mail do Contador', 'trim|valid_email');
-        $this->form_validation->set_rules('codigo_ibge', 'Código IBGE', 'trim');
-        $this->form_validation->set_rules('numero_nfe', 'Nº NF-e', 'trim|numeric');
-        $this->form_validation->set_rules('numero_nfce', 'Nº NFC-e', 'trim|numeric');
-        $this->form_validation->set_rules('cnae', 'CNAE', 'trim');
-        $this->form_validation->set_rules('atividade_principal', 'Atividade Principal', 'trim');
-        $this->form_validation->set_rules('situacao', 'Situação', 'trim');
-        $this->form_validation->set_rules('data_situacao', 'Data Situação', 'trim');
-        $this->form_validation->set_rules('data_abertura', 'Data Abertura', 'trim');
-        $this->form_validation->set_rules('natureza_juridica', 'Natureza Jurídica', 'trim');
-        $this->form_validation->set_rules('porte', 'Porte', 'trim');
-        $this->form_validation->set_rules('capital_social', 'Capital Social', 'trim');
-        $this->form_validation->set_rules('qsa', 'QSA', 'trim');
-
-        if ($this->form_validation->run() == false) {
-            $this->session->set_flashdata('error', 'Campos obrigatórios não foram preenchidos.');
+        if ($this->form_validation->run('emitente') == false) {
+            $this->session->set_flashdata('error', 'Campos obrigatórios não foram preenchidos: ' . validation_errors());
             redirect(site_url('mapos/emitente'));
         } else {
             $nome = $this->input->post('nome');
@@ -296,35 +269,8 @@ class Mapos extends MY_Controller
         }
 
         $this->load->library('form_validation');
-        $this->form_validation->set_rules('nome', 'Razão Social', 'required|trim');
-        $this->form_validation->set_rules('cnpj', 'CNPJ', 'required|trim');
-        $this->form_validation->set_rules('ie', 'IE', 'trim|callback_valid_ie_callback');
-        $this->form_validation->set_rules('im', 'IM', 'trim|callback_valid_im_callback');
-        $this->form_validation->set_rules('cep', 'CEP', 'required|trim');
-        $this->form_validation->set_rules('logradouro', 'Logradouro', 'required|trim');
-        $this->form_validation->set_rules('numero', 'Número', 'required|trim');
-        $this->form_validation->set_rules('complemento', 'Complemento', 'trim');
-        $this->form_validation->set_rules('bairro', 'Bairro', 'required|trim');
-        $this->form_validation->set_rules('cidade', 'Cidade', 'required|trim');
-        $this->form_validation->set_rules('uf', 'UF', 'required|trim');
-        $this->form_validation->set_rules('telefone', 'Telefone', 'required|trim');
-        $this->form_validation->set_rules('email', 'E-mail', 'required|trim');
-        $this->form_validation->set_rules('email_contador', 'E-mail do Contador', 'trim|valid_email');
-        $this->form_validation->set_rules('codigo_ibge', 'Código IBGE', 'trim');
-        $this->form_validation->set_rules('numero_nfe', 'Nº NF-e', 'trim|numeric');
-        $this->form_validation->set_rules('numero_nfce', 'Nº NFC-e', 'trim|numeric');
-        $this->form_validation->set_rules('cnae', 'CNAE', 'trim');
-        $this->form_validation->set_rules('atividade_principal', 'Atividade Principal', 'trim');
-        $this->form_validation->set_rules('situacao', 'Situação', 'trim');
-        $this->form_validation->set_rules('data_situacao', 'Data Situação', 'trim');
-        $this->form_validation->set_rules('data_abertura', 'Data Abertura', 'trim');
-        $this->form_validation->set_rules('natureza_juridica', 'Natureza Jurídica', 'trim');
-        $this->form_validation->set_rules('porte', 'Porte', 'trim');
-        $this->form_validation->set_rules('capital_social', 'Capital Social', 'trim');
-        $this->form_validation->set_rules('qsa', 'QSA', 'trim');
-
-        if ($this->form_validation->run() == false) {
-            $this->session->set_flashdata('error', 'Campos obrigatórios não foram preenchidos.');
+        if ($this->form_validation->run('emitente') == false) {
+            $this->session->set_flashdata('error', 'Campos obrigatórios não foram preenchidos: ' . validation_errors());
             redirect(site_url('mapos/emitente'));
         } else {
             $nome = $this->input->post('nome');
@@ -373,29 +319,8 @@ class Mapos extends MY_Controller
 
             $retorno = $this->mapos_model->editEmitente($id, $nome, $cnpj, $ie, $im, $cep, $logradouro, $numero, $complemento, $bairro, $cidade, $uf, $telefone, $email, $cnae, $atividade_principal, $situacao, $data_situacao, $data_abertura, $natureza_juridica, $porte, $capital_social, $qsa, $email_contador, $codigo_ibge, $numero_nfe, $numero_nfce, $latitude, $longitude);
             if ($retorno) {
-                $alteracoes = [];
-                if ($emitenteAntigo) {
-                    $novosDados = [
-                        'nome' => $nome, 'cnpj' => $cnpj, 'ie' => $ie, 'im' => $im, 'cep' => $cep,
-                        'rua' => $logradouro, 'numero' => $numero, 'complemento' => $complemento,
-                        'bairro' => $bairro, 'cidade' => $cidade, 'uf' => $uf, 'telefone' => $telefone,
-                        'email' => $email, 'cnae' => $cnae, 'atividade_principal' => $atividade_principal,
-                        'situacao' => $situacao, 'data_situacao' => $data_situacao, 'data_abertura' => $data_abertura,
-                        'natureza_juridica' => $natureza_juridica, 'porte' => $porte, 'capital_social' => $capital_social,
-                        'qsa' => $qsa, 'email_contador' => $email_contador, 'codigo_ibge' => $codigo_ibge,
-                        'latitude' => $latitude, 'longitude' => $longitude
-                    ];
-                    foreach ($novosDados as $campo => $novoValor) {
-                        $valorAntigo = $emitenteAntigo->$campo ?? '';
-                        if ($valorAntigo != $novoValor) {
-                            $alteracoes[] = $campo;
-                        }
-                    }
-                }
-                $detalhes = !empty($alteracoes) ? ' (Modificou: ' . implode(', ', $alteracoes) . ')' : '';
-
                 $this->session->set_flashdata('success', 'As informações foram alteradas com sucesso.');
-                log_info('Alterou informações de emitente.' . $detalhes);
+                log_info('Alterou informações de emitente.');
             } else {
                 $this->session->set_flashdata('error', 'Ocorreu um erro ao tentar alterar as informações.');
             }

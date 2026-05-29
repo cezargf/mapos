@@ -470,12 +470,18 @@ $config = [
         [
             'field' => 'ie',
             'label' => 'Inscrição Estadual',
-            'rules' => 'trim|max_length[20]|callback_valid_ie_callback',
+            'rules' => 'trim|max_length[20]|valid_ie',
+            'errors' => [
+                'valid_ie' => 'O campo Inscrição Estadual está inválido.',
+            ],
         ],
         [
             'field' => 'im',
             'label' => 'Inscrição Municipal',
-            'rules' => 'trim|max_length[20]|callback_valid_im_callback',
+            'rules' => 'trim|min_length[5]|max_length[20]|valid_im',
+            'errors' => [
+                'valid_im' => 'O campo Inscrição Municipal está inválido.',
+            ],
         ],
         [
             'field' => 'logradouro',

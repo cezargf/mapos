@@ -668,6 +668,7 @@
         const validationRules = {
             nome: { required: true },
             cnpj: { required: true },
+            cep: { required: true },
             logradouro: { required: true },
             numero: { required: true },
             bairro: { required: true },

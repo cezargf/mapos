@@ -2,13 +2,17 @@
 
 function dateInterval($startDate, $finalDate)
 {
+    if (!$startDate || $startDate == '0000-00-00') {
+        return '';
+    }
+
     $data = date('d/m/Y', strtotime($startDate));
 
     // Criar o objeto representando a data
     $obj_data = DateTime::createFromFormat('d/m/Y', $data);
     
     if (!$obj_data) {
-        throw new InvalidArgumentException('Erro ao converter a data: ' . $startDate);
+        return '';
     }
 
     $obj_data->setTime(0, 0, 0);

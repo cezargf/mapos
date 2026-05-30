@@ -1,3 +1,43 @@
+<?php
+/**
+ * @var array $configuration
+ * @var object[] $os_sistemas
+ */
+$custom_error = $custom_error ?? '';
+?>
+<style>
+    .nav-tabs {
+        margin-bottom: 0;
+        display: flex;
+        flex-wrap: wrap;
+        border-bottom: 1px solid #ddd;
+    }
+    .nav-tabs > li > a {
+        background-color: #f5f5f5;
+        border: 1px solid #ddd;
+        border-bottom: none;
+        border-radius: 8px 8px 0 0;
+        margin-right: 5px;
+        color: #555;
+        font-weight: 500;
+        padding: 10px 15px;
+        transition: all 0.3s ease;
+    }
+    .nav-tabs > li > a:hover {
+        background-color: #e9e9e9;
+        color: #333;
+    }
+    .nav-tabs > li.active > a,
+    .nav-tabs > li.active > a:hover,
+    .nav-tabs > li.active > a:focus {
+        background-color: #fff;
+        color: #2b82cb;
+        border-color: #ddd;
+        border-bottom: 1px solid #fff;
+        margin-bottom: -1px;
+        font-weight: bold;
+    }
+</style>
 <div class="row-fluid" style="margin-top:0">
     <div class="span12">
         <div class="widget-box">
@@ -390,6 +430,66 @@
                                     <span class="help-inline">Gostaria de imprimir os Anexos na impressão A4?</span>
                                 </div>
                             </div>
+                            <div class="span8">
+                                <label for="checklist_sistemas" class="control-label">Check-list de Sistemas</label>
+                                <div class="controls">
+                                    <select name="checklist_sistemas" id="checklist_sistemas">
+                                        <option value="1" <?= $configuration['checklist_sistemas'] == '1' ? 'selected' : ''; ?>>Ativar</option>
+                                        <option value="0" <?= $configuration['checklist_sistemas'] == '0' ? 'selected' : ''; ?>>Desativar</option>
+                                    </select>
+                                    <span class="help-inline">Ativar ou desativar o check-list de sistemas.</span>
+                                </div>
+                            </div>
+                            <div class="span8" id="divChecklistSistemas" style="<?= $configuration['checklist_sistemas'] == '1' ? '' : 'display: none;'; ?> margin-left: 3em; margin-top: 10px;">
+                                <div class="span12" style="margin-left: 0; margin-bottom: 10px;">
+                                    <button href="#modal-sistema" data-toggle="modal" type="button" class="button btn btn-success" id="btn-novo-sistema">
+                                        <span class="button__icon"><i class='bx bx-plus-circle'></i></span><span class="button__text2">Novo Sistema</span>
+                                    </button>
+                                </div>
+                                <div class="widget-box">
+                                    <div class="widget-title">
+                                        <span class="icon"><i class="fas fa-desktop"></i></span>
+                                        <h5>Sistemas e Campos Técnicos</h5>
+                                    </div>
+                                    <div class="widget-content nopadding">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>Sistema</th>
+                                                    <th>Campos Cadastrados</th>
+                                                    <th width="200">Ações</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <?php foreach ($os_sistemas as $s) : ?>
+                                                    <tr>
+                                                        <td><strong><?= $s->nome ?></strong></td>
+                                                        <td>
+                                                            <?php if($s->campos): ?>
+                                                                <ul style="margin: 0; list-style: none;">
+                                                                    <?php foreach($s->campos as $c): ?>
+                                                                        <li><small>• <?= $c->label ?> (<?= $c->tipo ?>)</small> 
+                                                                            <a href="#" class="btn-delete-campo" data-id="<?= $c->id ?>" style="color: red; margin-left: 5px;" title="Excluir Campo"><i class="fas fa-times-circle"></i></a>
+                                                                        </li>
+                                                                    <?php endforeach; ?>
+                                                                </ul>
+                                                            <?php else: ?>
+                                                                <span class="help-inline">Nenhum campo.</span>
+                                                            <?php endif; ?>
+                                                        </td>
+                                                        <td>
+                                                            <a title="Adicionar Campo" class="btn btn-mini btn-info btn-add-campo" data-sistema="<?= $s->id ?>" href="#modal-campo" data-toggle="modal"><i class="fas fa-plus"></i> Campo</a>
+                                                            <a title="Editar Sistema" class="btn btn-mini btn-warning btn-edit-sistema" data-id="<?= $s->id ?>" data-nome="<?= $s->nome ?>" href="#modal-sistema" data-toggle="modal"><i class="fas fa-edit"></i></a>
+                                                            <a title="Excluir Sistema" class="btn btn-mini btn-danger btn-delete-sistema" data-id="<?= $s->id ?>" href="#"><i class="fas fa-trash-alt"></i></a>
+                                                        </td>
+                                                    </tr>
+                                                <?php endforeach; ?>
+                                                <?php if (!$os_sistemas) echo '<tr><td colspan="3" style="text-align: center">Nenhum sistema cadastrado.</td></tr>'; ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="form-actions">
                             <div class="span8">
@@ -511,6 +611,80 @@
         </div>
     </div>
 </div>
+
+<!-- Modal Sistema -->
+<div id="modal-sistema" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <form id="formSistema" action="#" method="post">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h5 id="sistemaModalTitle">Novo Sistema</h5>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="idSistema" name="id" value="">
+            <div class="control-group">
+                <label for="nomeSistema" class="control-label">Nome do Sistema</label>
+                <div class="controls" style="margin-left: 10px;">
+                    <input type="text" required name="nome" id="nomeSistema" value="" placeholder="Ex: Ar Condicionado, Redes, etc.">
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer" style="display:flex;justify-content: center">
+          <button class="button btn btn-mini btn-danger" data-dismiss="modal" aria-hidden="true"><span class="button__icon"><i class='bx bx-x' ></i></span> <span class="button__text2">Cancelar</span></button>
+          <button type="submit" class="button btn btn-primary"><span class="button__icon"><i class="bx bx-save"></i></span><span class="button__text2">Salvar</span></button>
+        </div>
+    </form>
+</div>
+
+<!-- Modal Campo -->
+<div id="modal-campo" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <form id="formCampo" action="#" method="post">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h5>Adicionar Campo ao Sistema</h5>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="sistema_id_campo" name="sistema_id" value="">
+            <div class="control-group">
+                <label for="nomeCampo" class="control-label">Nome no Banco (sem espaços)</label>
+                <div class="controls" style="margin-left: 10px;">
+                    <input type="text" required name="nome" id="nomeCampo" value="" placeholder="Ex: tensao, num_cameras">
+                </div>
+            </div>
+            <div class="control-group">
+                <label for="labelCampo" class="control-label">Label (Como o usuário lerá)</label>
+                <div class="controls" style="margin-left: 10px;">
+                    <input type="text" required name="label" id="labelCampo" value="" placeholder="Ex: Tensão (V), Nº de Câmeras">
+                </div>
+            </div>
+            <div class="control-group">
+                <label for="tipoCampo" class="control-label">Tipo de Campo</label>
+                <div class="controls" style="margin-left: 10px;">
+                    <select name="tipo" id="tipoCampo">
+                        <option value="text">Texto</option>
+                        <option value="number">Número</option>
+                        <option value="select">Lista (Seleção)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="control-group">
+                <label for="valorPadraoCampo" class="control-label">Valor Padrão / Placeholder</label>
+                <div class="controls" style="margin-left: 10px;">
+                    <input type="text" name="valor_padrao" id="valorPadraoCampo" value="">
+                </div>
+            </div>
+            <div class="control-group" id="divOpcoesLista" style="display: none;">
+                <label for="opcoesLista" class="control-label">Opções da Lista (separadas por vírgula)</label>
+                <div class="controls" style="margin-left: 10px;">
+                    <textarea name="opcoes_lista" id="opcoesLista" placeholder="Ex: Opção 1, Opção 2, Opção 3"></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer" style="display:flex;justify-content: center">
+          <button class="button btn btn-mini btn-danger" data-dismiss="modal" aria-hidden="true"><span class="button__icon"><i class='bx bx-x' ></i></span> <span class="button__text2">Cancelar</span></button>
+          <button type="submit" class="button btn btn-primary"><span class="button__icon"><i class="bx bx-save"></i></span><span class="button__text2">Adicionar Campo</span></button>
+        </div>
+    </form>
+</div>
 <!-- Modal -->
 <div id="modal-confirmaratualiza" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <form action="<?php echo base_url() ?>index.php/clientes/excluir" method="post">
@@ -563,5 +737,136 @@
                 document.getElementById("notifica_whats").value += $(this).val();
             $(this).prop('selectedIndex', 0);
         });
+
+        // Lógica para exibição do Checklist de Sistemas
+        $('#checklist_sistemas').change(function() {
+            if ($(this).val() == '1') {
+                $('#divChecklistSistemas').show();
+            } else {
+                $('#divChecklistSistemas').hide();
+            }
+        });
+
+        // Lógica para Sistemas e Campos Dinâmicos
+        $('#tipoCampo').change(function() {
+            if ($(this).val() == 'select') {
+                $('#divOpcoesLista').show();
+            } else {
+                $('#divOpcoesLista').hide();
+            }
+        });
+
+        $('#btn-novo-sistema').click(function() {
+            $('#sistemaModalTitle').text('Novo Sistema');
+            $('#idSistema').val('');
+            $('#nomeSistema').val('');
+        });
+
+        $(document).on('click', '.btn-edit-sistema', function() {
+            $('#sistemaModalTitle').text('Editar Sistema');
+            $('#idSistema').val($(this).data('id'));
+            $('#nomeSistema').val($(this).data('nome'));
+        });
+
+        $('#formSistema').submit(function(e) {
+            e.preventDefault();
+            const id = $('#idSistema').val();
+            const url = id ? '<?= site_url('mapos/editSistema') ?>' : '<?= site_url('mapos/addSistema') ?>';
+            
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: $(this).serialize() + "&<?php echo $this->security->get_csrf_token_name(); ?>=<?php echo $this->security->get_csrf_hash(); ?>",
+                dataType: 'json',
+                success: function(data) {
+                    if (data.result) {
+                        $('#modal-sistema').modal('hide');
+                        $('#divChecklistSistemas').load(window.location.href + ' #divChecklistSistemas > *');
+                    } else {
+                        alert('Erro ao salvar sistema.');
+                    }
+                }
+            });
+        });
+
+        $(document).on('click', '.btn-delete-sistema', function(e) {
+            e.preventDefault();
+            if (confirm('Deseja realmente excluir este sistema e TODOS os seus campos?')) {
+                const id = $(this).data('id');
+                $.ajax({
+                    url: '<?= site_url('mapos/deleteSistema') ?>',
+                    type: 'POST',
+                    data: {
+                        id: id,
+                        "<?php echo $this->security->get_csrf_token_name(); ?>": "<?php echo $this->security->get_csrf_hash(); ?>"
+                    },
+                    dataType: 'json',
+                    success: function(data) {
+                        if (data.result) {
+                            $('#divChecklistSistemas').load(window.location.href + ' #divChecklistSistemas > *');
+                        } else {
+                            alert('Erro ao excluir sistema.');
+                        }
+                    }
+                });
+            }
+        });
+
+        $(document).on('click', '.btn-add-campo', function() {
+            $('#sistema_id_campo').val($(this).data('sistema'));
+            $('#formCampo')[0].reset();
+            $('#divOpcoesLista').hide();
+        });
+
+        $('#formCampo').submit(function(e) {
+            e.preventDefault();
+            $.ajax({
+                url: '<?= site_url('mapos/addCampoDynamic') ?>',
+                type: 'POST',
+                data: $(this).serialize() + "&<?php echo $this->security->get_csrf_token_name(); ?>=<?php echo $this->security->get_csrf_hash(); ?>",
+                dataType: 'json',
+                success: function(data) {
+                    if (data.result) {
+                        $('#modal-campo').modal('hide');
+                        $('#divChecklistSistemas').load(window.location.href + ' #divChecklistSistemas > *');
+                    } else {
+                        alert('Erro ao adicionar campo.');
+                    }
+                }
+            });
+        });
+
+        $(document).on('click', '.btn-delete-campo', function(e) {
+            e.preventDefault();
+            if (confirm('Deseja realmente excluir este campo?')) {
+                const id = $(this).data('id');
+                $.ajax({
+                    url: '<?= site_url('mapos/deleteCampoDynamic') ?>',
+                    type: 'POST',
+                    data: {
+                        id: id,
+                        "<?php echo $this->security->get_csrf_token_name(); ?>": "<?php echo $this->security->get_csrf_hash(); ?>"
+                    },
+                    dataType: 'json',
+                    success: function(data) {
+                        if (data.result) {
+                            $('#divChecklistSistemas').load(window.location.href + ' #divChecklistSistemas > *');
+                        } else {
+                            alert('Erro ao excluir campo.');
+                        }
+                    }
+                });
+            }
+        });
+    });
+
+    $('#whatsapp_gateway').on('change', function() {
+        var gateway = $(this).val();
+        $('.whatsapp_fields').hide();
+        if (gateway === 'whatsapp_cloud') {
+            $('#fields_whatsapp_cloud').show();
+        } else if (gateway === 'waha') {
+            $('#fields_waha').show();
+        }
     });
 </script>

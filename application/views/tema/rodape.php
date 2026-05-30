@@ -8,6 +8,20 @@
 <!--end-Footer-part-->
 <script src="<?= base_url() ?>assets/js/bootstrap.min.js"></script>
 <script src="<?= base_url() ?>assets/js/matrix.js"></script>
+<script type="text/javascript">
+    // Correção para modal-backdrop bloqueando cliques quando modal está oculto
+    $(document).on('hidden.bs.modal', '#modal-contato', function () {
+        // Força remoção do modal-backdrop se ainda existir
+        $('.modal-backdrop').remove();
+        // Remove classe modal-open do body se existir
+        $('body').removeClass('modal-open');
+    });
+
+    // Garante que o modal seja fechado corretamente ao clicar no backdrop
+    $(document).on('click', '.modal-backdrop', function() {
+        $('#modal-contato').modal('hide');
+    });
+</script>
 </body>
 <script type="text/javascript">
     $(document).ready(function() {
@@ -25,6 +39,6 @@
                 }
             } );
         }
-    } );
+    });
 </script>
 </html>

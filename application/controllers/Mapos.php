@@ -461,6 +461,7 @@ class Mapos extends MY_Controller
         $this->form_validation->set_rules('control_datatable', 'Controle de Visualização em DataTables', 'required|trim');
         $this->form_validation->set_rules('os_status_list[]', 'Controle de visualização de OS', 'required|trim', ['required' => 'Selecione ao menos uma das opções!']);
         $this->form_validation->set_rules('control_2vias', 'Controle Impressão 2 Vias', 'required|trim');
+        $this->form_validation->set_rules('checklist_sistemas', 'Check-list de Sistemas', 'required|trim');
         $this->form_validation->set_rules('pix_key', 'Chave Pix', 'trim|valid_pix_key', [
             'valid_pix_key' => 'Chave Pix inválida!',
         ]);
@@ -468,6 +469,9 @@ class Mapos extends MY_Controller
         if ($this->form_validation->run() == false) {
             $this->data['custom_error'] = (validation_errors() ? '<div class="alert">' . validation_errors() . '</div>' : false);
         } else {
+            
+            $emailPass = base64_encode($this->input->post('EMAIL_SMTP_PASS'));
+
             // Edição do .env
             $dataDotEnv = [
                 'IMPRIMIR_ANEXOS' => $this->input->post('imprmirAnexos'),
@@ -515,6 +519,7 @@ class Mapos extends MY_Controller
                 'pix_key' => $this->input->post('pix_key'),
                 'os_status_list' => json_encode($this->input->post('os_status_list')),
                 'control_2vias' => $this->input->post('control_2vias'),
+                'checklist_sistemas' => $this->input->post('checklist_sistemas'),
             ];
             if ($this->mapos_model->saveConfiguracao($data) == true) {
                 $this->session->set_flashdata('success', 'Configurações do sistema atualizadas com sucesso!');
@@ -522,6 +527,12 @@ class Mapos extends MY_Controller
             } else {
                 $this->data['custom_error'] = '<div class="alert">Ocorreu um errro.</div>';
             }
+        }
+
+        $this->load->model('os_model');
+        $this->data['os_sistemas'] = $this->db->get('os_sistemas')->result();
+        foreach ($this->data['os_sistemas'] as $s) {
+            $s->campos = $this->db->get_where('os_campos_dinamicos', ['sistema_id' => $s->id])->result();
         }
 
         $this->data['view'] = 'mapos/configurar';
@@ -653,6 +664,85 @@ class Mapos extends MY_Controller
             ->set_output(json_encode($events));
     }
 
+    public function addSistema()
+    {
+        if (!$this->permission->checkPermission($this->session->userdata('permissao'), 'cSistema')) {
+            return $this->output->set_status_header(403)->set_output(json_encode(['result' => false, 'message' => 'Sem permissão']));
+        }
+
+        $nome = $this->input->post('nome');
+        if ($this->mapos_model->add('os_sistemas', ['nome' => $nome])) {
+            return $this->output->set_output(json_encode(['result' => true]));
+        }
+
+        return $this->output->set_output(json_encode(['result' => false]));
+    }
+
+    public function editSistema()
+    {
+        if (!$this->permission->checkPermission($this->session->userdata('permissao'), 'cSistema')) {
+            return $this->output->set_status_header(403)->set_output(json_encode(['result' => false, 'message' => 'Sem permissão']));
+        }
+
+        $id = $this->input->post('id');
+        $nome = $this->input->post('nome');
+        if ($this->mapos_model->edit('os_sistemas', ['nome' => $nome], 'id', $id)) {
+            return $this->output->set_output(json_encode(['result' => true]));
+        }
+
+        return $this->output->set_output(json_encode(['result' => false]));
+    }
+
+    public function deleteSistema()
+    {
+        if (!$this->permission->checkPermission($this->session->userdata('permissao'), 'cSistema')) {
+            return $this->output->set_status_header(403)->set_output(json_encode(['result' => false, 'message' => 'Sem permissão']));
+        }
+
+        $id = $this->input->post('id');
+        if ($this->mapos_model->delete('os_sistemas', 'id', $id)) {
+            return $this->output->set_output(json_encode(['result' => true]));
+        }
+
+        return $this->output->set_output(json_encode(['result' => false]));
+    }
+
+    public function addCampoDynamic()
+    {
+        if (!$this->permission->checkPermission($this->session->userdata('permissao'), 'cSistema')) {
+            return $this->output->set_status_header(403)->set_output(json_encode(['result' => false, 'message' => 'Sem permissão']));
+        }
+
+        $data = [
+            'sistema_id' => $this->input->post('sistema_id'),
+            'nome' => $this->input->post('nome'),
+            'label' => $this->input->post('label'),
+            'tipo' => $this->input->post('tipo'),
+            'valor_padrao' => $this->input->post('valor_padrao'),
+            'opcoes_lista' => $this->input->post('opcoes_lista')
+        ];
+
+        if ($this->mapos_model->add('os_campos_dinamicos', $data)) {
+            return $this->output->set_output(json_encode(['result' => true]));
+        }
+
+        return $this->output->set_output(json_encode(['result' => false]));
+    }
+
+    public function deleteCampoDynamic()
+    {
+        if (!$this->permission->checkPermission($this->session->userdata('permissao'), 'cSistema')) {
+            return $this->output->set_status_header(403)->set_output(json_encode(['result' => false, 'message' => 'Sem permissão']));
+        }
+
+        $id = $this->input->post('id');
+        if ($this->mapos_model->delete('os_campos_dinamicos', 'id', $id)) {
+            return $this->output->set_output(json_encode(['result' => true]));
+        }
+
+        return $this->output->set_output(json_encode(['result' => false]));
+    }
+
     private function editDontEnv(array $data)
     {
         $env_file_path = dirname(__FILE__, 2) . DIRECTORY_SEPARATOR . '.env';
@@ -662,16 +752,19 @@ class Mapos extends MY_Controller
             if ($constante == 'API_JWT_KEY' && $valor == 'sim') {
                 $base64 = base64_encode(openssl_random_pseudo_bytes(32));
                 $valor = '"' . $base64 . '"';
-                $env_file = str_replace("$constante=" . '"' . $_ENV[$constante] . '"', "$constante={$valor}", $env_file);
-            } else {
-                if (isset($_ENV[$constante])) {
-                    $env_file = str_replace("$constante={$_ENV[$constante]}", "$constante={$valor}", $env_file);
+                if (preg_match("/^{$constante}=.*/m", $env_file)) {
+                    $env_file = preg_replace("/^{$constante}=.*/m", "{$constante}={$valor}", $env_file);
                 } else {
-                    file_put_contents($env_file_path, $env_file . "\n{$constante}={$valor}\n");
-                    $env_file = file_get_contents($env_file_path);
+                    $env_file .= "\n{$constante}={$valor}\n";
+                }
+            } else {
+                if (preg_match("/^{$constante}=.*/m", $env_file)) {
+                    $env_file = preg_replace("/^{$constante}=.*/m", "{$constante}={$valor}", $env_file);
+                } else {
+                    $env_file .= "\n{$constante}={$valor}\n";
                 }
             }
         }
-        return file_put_contents($env_file_path, $env_file) ? true : false;
+        return file_put_contents($env_file_path, trim($env_file) . "\n") !== false;
     }
 }

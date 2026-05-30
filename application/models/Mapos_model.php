@@ -78,10 +78,14 @@ class Mapos_model extends CI_Model
         return $data;
     }
 
-    public function add($table, $data)
+    public function add($table, $data, $returnId = false)
     {
         $this->db->insert($table, $data);
         if ($this->db->affected_rows() == '1') {
+            if ($returnId == true) {
+                return $this->db->insert_id($table);
+            }
+
             return true;
         }
 

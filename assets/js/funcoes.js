@@ -115,6 +115,23 @@ $(document).ready(function () {
         return str.join(" ");
     }
 
+    // Função para converter data do formato DD/MM/YYYY para YYYY-MM-DD
+    function converterDataParaMySQL(dataString) {
+        if (!dataString || dataString === '') return '';
+        var partes = dataString.split('/');
+        if (partes.length !== 3) return dataString;
+        return partes[2] + '-' + partes[1] + '-' + partes[0];
+    }
+
+    // Função para garantir que a data esteja no formato DD/MM/YYYY
+    function converterDataParaBR(dataString) {
+        if (!dataString || dataString === '') return '';
+        if (dataString.indexOf('/') !== -1) return dataString;
+        var partes = dataString.split('-');
+        if (partes.length !== 3) return dataString;
+        return partes[2] + '/' + partes[1] + '/' + partes[0];
+    }
+
     // Valida CNPJ
      // Função auxiliar para calcular o DV alfanumérico
    function valorCharAlfanumerico(char) {
@@ -215,6 +232,8 @@ function validarCNPJ(cnpj) {
 
             //Preenche os campos com "..." enquanto consulta webservice.
             $("#nomeCliente").val("...");
+            $("#fantasia").val("...");
+            $("#tipo").val("...");
             $("#email").val("...");
             $("#cep").val("...");
             $("#rua").val("...");
@@ -224,6 +243,20 @@ function validarCNPJ(cnpj) {
             $("#estado").val("...");
             $("#complemento").val("...");
             $("#telefone").val("...");
+            $("#cnae").val("...");
+            $("#atividade_principal").val("...");
+            $("#atividades_secundarias").val("...");
+            $("#natureza_juridica").val("...");
+
+            $("#situacao").val("...");
+            $("#data_situacao").val("...");
+            $("#motivo_situacao").val("...");
+            $("#situacao_especial").val("...");
+            $("#data_situacao_especial").val("...");
+            $("#data_abertura").val("...");
+            $("#porte").val("...");
+            $("#capital_social").val("...");
+            $("#qsa").val("...");
             //Consulta o webservice receitaws.com.br/
             $.ajax({
                 url: "https://www.receitaws.com.br/v1/cnpj/" + ndocumento,
@@ -239,19 +272,49 @@ function validarCNPJ(cnpj) {
                         if ($("#nomeEmitente").val() != null) {
                             $("#nomeEmitente").val(capital_letter(dados.nome));
                         }
-                        $("#cep").val(dados.cep.replace(/\./g, ''));
-                        $("#email").val(dados.email.toLocaleLowerCase());
-                        $("#telefone").val(dados.telefone.split("/")[0].replace(/\ /g, ''));
-                        $("#rua").val(capital_letter(dados.logradouro));
-                        $("#numero").val(dados.numero);
-                        $("#bairro").val(capital_letter(dados.bairro));
-                        $("#cidade").val(capital_letter(dados.municipio));
-                        $("#estado").val(dados.uf);
-                        if (dados.complemento != "") {
-                            $("#complemento").val(capital_letter(dados.complemento));
-                        } else{
-                            $("#complemento").val("");
+                        
+                        // Ajuste no CEP: Manter hífem (remover apenas pontos)
+                        $("#cep").val(dados.cep ? dados.cep.replace(/\./g, '') : '');
+                        
+                        $("#email").val(dados.email ? dados.email.toLowerCase() : '');
+                        
+                        // Ajuste no Telefone: Adicionar dígito 9 se tiver apenas 10 dígitos (DDD + 8) e for celular
+                        let tel = dados.telefone ? dados.telefone.split("/")[0].replace(/\D/g, '') : '';
+                        if (tel.length === 10) {
+                            // No Brasil, celulares começam com 6, 7, 8 ou 9 após o DDD. Fixo começa com 2, 3, 4 ou 5.
+                            let firstDigit = tel.substring(2, 3);
+                            if (['6', '7', '8', '9'].includes(firstDigit)) {
+                                tel = tel.substring(0, 2) + '9' + tel.substring(2);
+                            }
                         }
+                        $("#telefone").val(tel);
+                        
+                        // Reaplica a máscara no campo telefone após definir o valor
+                        $('#telefone').trigger('input');
+                        $("#rua").val(dados.logradouro ? capital_letter(dados.logradouro) : '');
+                        $("#numero").val(dados.numero || '');
+                        $("#bairro").val(dados.bairro ? capital_letter(dados.bairro) : '');
+                        $("#cidade").val(dados.municipio ? capital_letter(dados.municipio) : '');
+                        $("#estado").val(dados.uf || '');
+                        $("#complemento").val(dados.complemento ? capital_letter(dados.complemento) : '');
+
+                        // Campos específicos da ReceitaWS
+                        $("#cnae").val(dados.atividade_principal && dados.atividade_principal[0] ? dados.atividade_principal[0].code : '');
+                        $("#atividade_principal").val(dados.atividade_principal && dados.atividade_principal[0] ? capital_letter(dados.atividade_principal[0].text) : '');
+                        $("#atividades_secundarias").val(dados.atividades_secundarias ? dados.atividades_secundarias.map(item => item.text ? capital_letter(item.text) : '').join('\n') : '');
+                        $("#situacao").val(dados.situacao ? capital_letter(dados.situacao) : '');
+                        $("#data_situacao").val(dados.data_situacao ? converterDataParaBR(dados.data_situacao) : '');
+                        $("#motivo_situacao").val(dados.motivo_situacao ? capital_letter(dados.motivo_situacao) : '');
+                        $("#situacao_especial").val(dados.situacao_especial ? capital_letter(dados.situacao_especial) : '');
+                        $("#data_situacao_especial").val(dados.data_situacao_especial ? converterDataParaBR(dados.data_situacao_especial) : '');
+                        $("#data_abertura").val(dados.abertura ? converterDataParaBR(dados.abertura) : '');
+                        $("#natureza_juridica").val(dados.natureza_juridica ? capital_letter(dados.natureza_juridica) : '');
+
+                        $("#tipo").val(dados.tipo ? capital_letter(dados.tipo) : '');
+                        $("#fantasia").val(dados.fantasia ? capital_letter(dados.fantasia) : '');
+                        $("#porte").val(dados.porte ? capital_letter(dados.porte) : '');
+                        $("#capital_social").val(dados.capital_social ? String(dados.capital_social) : '');
+                        $("#qsa").val(dados.qsa ? dados.qsa.map(socio => socio.nome ? capital_letter(socio.nome) : '').join('\n') : '');
 
                         // Força uma atualizacao do endereco via cep
                         //document.getElementById("cep").focus();
@@ -263,7 +326,7 @@ function validarCNPJ(cnpj) {
                         }
                     } //end if.
                     else {
-                        //CEP pesquisado não foi encontrado.
+                        //CNPJ pesquisado não foi encontrado.
                         if ($("#nomeCliente").val() != null) {
                             $("#nomeCliente").val("");
                         }
@@ -275,6 +338,25 @@ function validarCNPJ(cnpj) {
                         $("#numero").val("");
                         $("#complemento").val("");
                         $("#telefone").val("");
+                        $("#rua").val("");
+                        $("#bairro").val("");
+                        $("#cidade").val("");
+                        $("#estado").val("");
+                        $("#cnae").val("");
+                        $("#atividade_principal").val("");
+                        $("#atividades_secundarias").val("");
+                        $("#situacao").val("");
+                        $("#data_situacao").val("");
+                        $("#motivo_situacao").val("");
+                        $("#situacao_especial").val("");
+                        $("#data_situacao_especial").val("");
+                        $("#data_abertura").val("");
+                        $("#natureza_juridica").val("");
+                        $("#tipo").val("");
+                        $("#fantasia").val("");
+                        $("#porte").val("");
+                        $("#capital_social").val("");
+                        $("#qsa").val("");
 
                         Swal.fire({
                             type: "warning",
@@ -284,7 +366,7 @@ function validarCNPJ(cnpj) {
                     }
                 },
                 error: function () {
-                    ///CEP pesquisado não foi encontrado.
+                    //CNPJ pesquisado não foi encontrado.
                     if ($("#nomeCliente").val() != null) {
                         $("#nomeCliente").val("");
                     }
@@ -296,6 +378,25 @@ function validarCNPJ(cnpj) {
                     $("#numero").val("");
                     $("#complemento").val("");
                     $("#telefone").val("");
+                    $("#rua").val("");
+                    $("#bairro").val("");
+                    $("#cidade").val("");
+                    $("#estado").val("");
+                    $("#cnae").val("");
+                    $("#atividade_principal").val("");
+                    $("#atividades_secundarias").val("");
+                    $("#situacao").val("");
+                    $("#data_situacao").val("");
+                    $("#motivo_situacao").val("");
+                    $("#situacao_especial").val("");
+                    $("#data_situacao_especial").val("");
+                    $("#data_abertura").val("");
+                    $("#natureza_juridica").val("");
+                    $("#tipo").val("");
+                    $("#fantasia").val("");
+                    $("#porte").val("");
+                    $("#capital_social").val("");
+                    $("#qsa").val("");
 
                     Swal.fire({
                         type: "warning",

@@ -32,6 +32,8 @@
   <?php if ($configuration['app_theme'] == 'whiteblack') { ?>
     <link rel="stylesheet" href="<?= base_url(); ?>assets/css/tema-white-black.css" />
   <?php } ?>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700,800' rel='stylesheet' type='text/css'>
   <link href='https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300;400;500;700&display=swap' rel='stylesheet' type='text/css'>
   <link href='https://unpkg.com/boxicons@2.1.1/css/boxicons.min.css' rel='stylesheet'>
@@ -42,9 +44,9 @@
   <script type="text/javascript" src="<?= base_url(); ?>assets/js/sweetalert.min.js"></script>
   <script type="text/javascript" src="<?= base_url(); ?>assets/js/csrf.js"></script>
   <script type="text/javascript">
-    shortcut.add("escape", function() {
-      location.href = '<?= base_url(); ?>';
-    });
+    // shortcut.add("escape", function() {
+    //   location.href = '<?= base_url(); ?>';
+    // });
     shortcut.add("F1", function() {
       location.href = '<?= site_url('clientes'); ?>';
     });

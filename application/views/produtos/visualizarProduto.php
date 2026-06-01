@@ -54,8 +54,63 @@
                                 <?php echo $result->estoqueMinimo; ?>
                             </td>
                         </tr>
+                        <tr>
+                            <td style="text-align: right"><strong>Página do Produto</strong></td>
+                            <td>
+                                <a href="<?php echo $result->url_pagina ?>" target="_blank"><?php echo $result->url_pagina ?></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: right"><strong>Especificações</strong></td>
+                            <td>
+                                <a href="<?php echo $result->url_especificacoes ?>" target="_blank"><?php echo $result->url_especificacoes ?></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: right"><strong>NCM</strong></td>
+                            <td>
+                                <?php echo $result->ncm ?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: right"><strong>CEST</strong></td>
+                            <td>
+                                <?php echo $result->cest ?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: right"><strong>Origem</strong></td>
+                            <td>
+                                <?php echo $result->origem ?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: right"><strong>CST/CSOSN</strong></td>
+                            <td>
+                                <?php echo $result->cst_csosn ?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: right"><strong>IBS/CBS</strong></td>
+                            <td>
+                                <?php echo $result->ibs_cbs ?>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
+
+                <div style="margin-top: 20px;">
+                    <h5>Imagens do Produto</h5>
+                    <ul class="thumbnails">
+                        <?php foreach ($images as $img) : ?>
+                            <li class="span2">
+                                <a href="<?php echo $img->url; ?>" target="_blank" class="thumbnail">
+                                    <img src="<?php echo $img->thumb; ?>" alt="">
+                                </a>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>

@@ -7,15 +7,19 @@ class Produtos_model extends CI_Model
         parent::__construct();
     }
 
-    public function get($table, $fields, $where = '', $perpage = 0, $start = 0, $one = false, $array = 'array')
+    public function get($table, $fields, $where = '', $perpage = 0, $start = 0, $one = false, $array = 'array', $sort = 'idProdutos', $order = 'desc')
     {
-        $this->db->select($fields);
-        $this->db->from($table);
-        $this->db->order_by('idProdutos', 'desc');
+        $this->db->select('produtos.*, produtos_imagens.thumb');
+        $this->db->from('produtos');
+        $this->db->join('produtos_imagens', 'produtos_imagens.produtos_id = produtos.idProdutos AND produtos_imagens.principal = 1', 'left');
+        $this->db->order_by($sort, $order);
         $this->db->limit($perpage, $start);
+        
         if ($where) {
+            $this->db->group_start();
             $this->db->like('codDeBarra', $where);
             $this->db->or_like('descricao', $where);
+            $this->db->group_end();
         }
 
         $query = $this->db->get();
@@ -33,10 +37,21 @@ class Produtos_model extends CI_Model
         return $this->db->get('produtos')->row();
     }
 
-    public function add($table, $data)
+    public function getByCodDeBarra($codDeBarra)
+    {
+        $this->db->where('codDeBarra', $codDeBarra);
+        $this->db->limit(1);
+        return $this->db->get('produtos')->row();
+    }
+
+    public function add($table, $data, $returnId = false)
     {
         $this->db->insert($table, $data);
-        if ($this->db->affected_rows() == '1') {
+        if ($this->db->affected_rows() > 0) {
+            if ($returnId) {
+                return $this->db->insert_id();
+            }
+
             return true;
         }
 
@@ -59,7 +74,7 @@ class Produtos_model extends CI_Model
     {
         $this->db->where($fieldID, $ID);
         $this->db->delete($table);
-        if ($this->db->affected_rows() == '1') {
+        if ($this->db->affected_rows() > 0) {
             return true;
         }
 
@@ -71,10 +86,46 @@ class Produtos_model extends CI_Model
         return $this->db->count_all($table);
     }
 
-    public function updateEstoque($produto, $quantidade, $operacao = '-')
+    public function updateEstoque($idProduto, $estoque, $operacao = '+')
     {
-        $sql = "UPDATE produtos set estoque = estoque $operacao ? WHERE idProdutos = ?";
+        $this->db->set('estoque', 'estoque ' . $operacao . ' ' . $estoque, false);
+        $this->db->where('idProdutos', $idProduto);
+        $this->db->update('produtos');
 
-        return $this->db->query($sql, [$quantidade, $produto]);
+        return true;
+    }
+
+    public function addImages($images)
+    {
+        $this->db->insert_batch('produtos_imagens', $images);
+    }
+
+    public function getImages($idProduto)
+    {
+        $this->db->where('produtos_id', $idProduto);
+        return $this->db->get('produtos_imagens')->result();
+    }
+
+    public function getImageById($idImage)
+    {
+        $this->db->where('idImagens', $idImage);
+        return $this->db->get('produtos_imagens')->row();
+    }
+
+    public function deleteImage($idImage)
+    {
+        $this->db->where('idImagens', $idImage);
+        return $this->db->delete('produtos_imagens');
+    }
+
+    public function setMainImage($idImage, $idProduto)
+    {
+        // Desmarcar todas as imagens do produto como principal
+        $this->db->where('produtos_id', $idProduto);
+        $this->db->update('produtos_imagens', ['principal' => 0]);
+
+        // Marcar a imagem selecionada como principal
+        $this->db->where('idImagens', $idImage);
+        return $this->db->update('produtos_imagens', ['principal' => 1]);
     }
 }

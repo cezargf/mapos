@@ -161,8 +161,8 @@ $config = [
     'produtos' => [
         [
             'field' => 'descricao',
-            'label' => '',
-            'rules' => 'required|trim',
+            'label' => 'Descrição',
+            'rules' => 'required|trim|max_length[255]',
         ],
         [
             'field' => 'unidade',
@@ -187,6 +187,41 @@ $config = [
         [
             'field' => 'estoqueMinimo',
             'label' => 'Estoque Minimo',
+            'rules' => 'trim',
+        ],
+        [
+            'field' => 'url_pagina',
+            'label' => 'Página do Produto (URL)',
+            'rules' => 'trim|valid_url',
+        ],
+        [
+            'field' => 'url_especificacoes',
+            'label' => 'Especificações (URL)',
+            'rules' => 'trim|valid_url',
+        ],
+        [
+            'field' => 'ncm',
+            'label' => 'NCM',
+            'rules' => 'required|trim|max_length[8]',
+        ],
+        [
+            'field' => 'cest',
+            'label' => 'CEST',
+            'rules' => 'trim',
+        ],
+        [
+            'field' => 'origem',
+            'label' => 'Origem',
+            'rules' => 'trim',
+        ],
+        [
+            'field' => 'cst_csosn',
+            'label' => 'CST/CSOSN',
+            'rules' => 'required|trim|max_length[3]',
+        ],
+        [
+            'field' => 'ibs_cbs',
+            'label' => 'IBS/CBS',
             'rules' => 'trim',
         ],
     ],

@@ -461,7 +461,6 @@ class Mapos extends MY_Controller
         $this->form_validation->set_rules('control_datatable', 'Controle de Visualização em DataTables', 'required|trim');
         $this->form_validation->set_rules('os_status_list[]', 'Controle de visualização de OS', 'required|trim', ['required' => 'Selecione ao menos uma das opções!']);
         $this->form_validation->set_rules('control_2vias', 'Controle Impressão 2 Vias', 'required|trim');
-        $this->form_validation->set_rules('checklist_sistemas', 'Check-list de Sistemas', 'required|trim');
         $this->form_validation->set_rules('pix_key', 'Chave Pix', 'trim|valid_pix_key', [
             'valid_pix_key' => 'Chave Pix inválida!',
         ]);
@@ -527,12 +526,6 @@ class Mapos extends MY_Controller
             } else {
                 $this->data['custom_error'] = '<div class="alert">Ocorreu um errro.</div>';
             }
-        }
-
-        $this->load->model('os_model');
-        $this->data['os_sistemas'] = $this->db->get('os_sistemas')->result();
-        foreach ($this->data['os_sistemas'] as $s) {
-            $s->campos = $this->db->get_where('os_campos_dinamicos', ['sistema_id' => $s->id])->result();
         }
 
         $this->data['view'] = 'mapos/configurar';

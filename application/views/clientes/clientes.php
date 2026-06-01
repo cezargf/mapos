@@ -126,10 +126,6 @@
                         <span class="button__icon"><i class='bx bx-plus-circle'></i></span>
                         <span class="button__text2">Cliente / Fornecedor</span>
                     </a>
-                    <a href="<?= site_url('prospeccao') ?>" class="button btn btn-mini btn-info" style="max-width: max-content;">
-                        <span class="button__icon"><i class='bx bx-search-alt'></i></span>
-                        <span class="button__text2">Prospecção B2B</span>
-                    </a>
                 </div>
             <?php } ?>
 

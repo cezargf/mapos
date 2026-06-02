@@ -1,6 +1,6 @@
 $(function () {
     $("#celular").mask("(00) 00000-0000")
-    $("#cep").mask("00000-000")
+    $(".cep, #cep").mask("00000-000")
     $('#cpfUser').mask('000.000.000-00', { reverse: true });
     $('.cnpjEmitente').mask('00.000.000/0000-00', { reverse: true });
 });
@@ -31,11 +31,11 @@ $(function () {
                 field.mask(telefoneN.apply({}, arguments), options);
             },
         };
-    $('#telefone').mask(telefoneN, telefoneOptions);
-    $('#telefone').on('paste', function (e) {
+    $('.telefone, #telefone').mask(telefoneN, telefoneOptions);
+    $('.telefone, #telefone').on('paste', function (e) {
         e.preventDefault();
         var clipboardCurrentData = (e.originalEvent || e).clipboardData.getData('text/plain');
-        $('#telefone').val(clipboardCurrentData);
+        $('.telefone, #telefone').val(clipboardCurrentData);
     });
 
 });
@@ -315,7 +315,7 @@ function validarCNPJ(cnpj) {
     });
 
     //Quando o campo cep perde o foco.
-    $("#cep").blur(function () {
+    $(".cep, #cep").blur(function () {
 
         //Nova variável "cep" somente com dígitos.
         var cep = $(this).val().replace(/\D/g, '');
@@ -374,3 +374,92 @@ function validarCNPJ(cnpj) {
         }
     });
 }); 
+
+// assets/js/geocoding.js
+
+/**
+ * Busca coordenadas de geolocalização para um endereço.
+ * Tenta primariamente com a API Nominatim e, em caso de falha, usa a API Photon como fallback.
+ *
+ * @param {string} street - O logradouro (rua, avenida, etc.).
+ * @param {string} number - O número do endereço.
+ * @param {string} neighborhood - O bairro.
+ * @param {string} city - A cidade.
+ * @param {string} state - O estado (UF).
+ * @param {function(object): void} successCallback - Função a ser chamada em caso de sucesso. Recebe um objeto com as chaves 'lat' e 'lon'.
+ * @param {function(string): void} errorCallback - Função a ser chamada em caso de erro. Recebe uma mensagem de erro.
+ */
+function geocodeAddress(street, number, neighborhood, city, state, cep, successCallback, errorCallback) {
+    if (!street || !city || !state) {
+        if (errorCallback) {
+            errorCallback('Por favor, preencha o endereço completo.');
+        }
+        return;
+    }
+
+    const queries = [
+        `${street}, ${number}, ${neighborhood}, ${city}, ${state}, ${cep}, Brasil`, // Mais específico
+        `${street}, ${number}, ${city}, ${state}, Brasil`, // Menos bairro e cep
+        `${street}, ${city}, ${state}, Brasil` // Apenas rua, cidade e estado
+    ];
+
+    let currentQueryIndex = 0;
+
+    function tryNextQuery() {
+        if (currentQueryIndex >= queries.length) {
+            if (errorCallback) {
+                errorCallback('Coordenadas não encontradas. Verifique o endereço.');
+            }
+            return;
+        }
+
+        const encodedQuery = encodeURIComponent(queries[currentQueryIndex]);
+
+        // Tenta com Nominatim primeiro
+        $.getJSON(`https://nominatim.openstreetmap.org/search?format=json&q=${encodedQuery}&limit=1`)
+            .done(data => {
+                if (data && data.length > 0) {
+                    successCallback({
+                        lat: parseFloat(data[0].lat).toFixed(8),
+                        lon: parseFloat(data[0].lon).toFixed(8)
+                    });
+                } else {
+                    // Fallback para Photon se Nominatim não encontrar
+                    geocodeWithPhoton(encodedQuery, successCallback, () => {
+                        currentQueryIndex++;
+                        tryNextQuery();
+                    });
+                }
+            })
+            .fail(() => {
+                // Fallback para Photon se Nominatim falhar
+                geocodeWithPhoton(encodedQuery, successCallback, () => {
+                    currentQueryIndex++;
+                    tryNextQuery();
+                });
+            });
+    }
+
+    tryNextQuery();
+}
+
+function geocodeWithPhoton(encodedQuery, successCallback, errorCallback) {
+    $.getJSON(`https://photon.komoot.io/api/?q=${encodedQuery}&limit=1`)
+        .done(photonData => {
+            if (photonData.features && photonData.features.length > 0) {
+                successCallback({
+                    lat: parseFloat(photonData.features[0].geometry.coordinates[1]).toFixed(8),
+                    lon: parseFloat(photonData.features[0].geometry.coordinates[0]).toFixed(8)
+                });
+            } else {
+                if (errorCallback) {
+                    errorCallback();
+                }
+            }
+        })
+        .fail(() => {
+            if (errorCallback) {
+                errorCallback();
+            }
+        });
+}

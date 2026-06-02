@@ -2,7 +2,7 @@
 <script src="<?php echo base_url() ?>assets/js/sweetalert2.all.min.js"></script>
 <script src="<?php echo base_url() ?>assets/js/funcoes.js"></script>
 
-<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+<link href="<?php echo base_url() ?>assets/css/select2.css" rel="stylesheet" />
 <style>
     .modal {
         overflow-y: auto !important;
@@ -110,7 +110,7 @@
                 <div class="control-group">
                     <label for="cep" class="control-label"><span class="required"></span></label>
                     <div class="controls">
-                        <input id="cep" type="text" placeholder="CEP*" name="cep" value="" title="CEP: Código de Endereçamento Postal. Campo obrigatório, formato: 00000-000." />
+                        <input id="cep" type="text" placeholder="CEP*" name="cep" value="" class="cep" title="CEP: Código de Endereçamento Postal. Campo obrigatório, formato: 00000-000." />
                     </div>
                 </div>
                 <div class="control-group">
@@ -177,7 +177,7 @@
                 <div class="control-group">
                     <label for="telefone" class="control-label"><span class="required"></span></label>
                     <div class="controls">
-                        <input id="telefone" type="text" placeholder="Telefone*" name="telefone" value="" title="Telefone: Número de telefone fixo ou comercial. Campo obrigatório." />
+                        <input id="telefone" type="text" placeholder="Telefone*" name="telefone" value="" class="telefone" title="Telefone: Número de telefone fixo ou comercial. Campo obrigatório." />
                     </div>
                 </div>
                 <div class="control-group">
@@ -338,7 +338,7 @@
                 <div class="control-group">
                     <label for="edit_cep" class="control-label"><span class="required"></span></label>
                     <div class="controls">
-                        <input id="edit_cep" type="text" name="cep" value="<?= $dados->cep; ?>" placeholder="CEP*" title="CEP: Código de Endereçamento Postal. Campo obrigatório, formato: 00000-000." />
+                        <input id="edit_cep" type="text" name="cep" value="<?= $dados->cep; ?>" placeholder="CEP*" class="cep" title="CEP: Código de Endereçamento Postal. Campo obrigatório, formato: 00000-000." />
                     </div>
                 </div>
                 <div class="control-group">
@@ -407,7 +407,7 @@
                     <label for="edit_telefone" class="control-label"><span class="required"></span></label>
                     <div class="controls">
                         <input type="text" id="edit_telefone" name="telefone" value="<?= $dados->telefone; ?>"
-                            placeholder="Telefone*" title="Telefone: Número de telefone fixo ou comercial. Campo obrigatório." />
+                            placeholder="Telefone*" class="telefone" title="Telefone: Número de telefone fixo ou comercial. Campo obrigatório." />
                     </div>
                 </div>
                 <div class="control-group">
@@ -593,10 +593,33 @@
                     .fail(() => $.getJSON('<?= base_url() ?>assets/json/estados.json', data => popularEstados(data.estados)));
             }
 
+            function handleGeocode(modal) {
+                const street = modal.find('input[name="logradouro"]').val();
+                const number = modal.find('input[name="numero"]').val();
+                const neighborhood = modal.find('input[name="bairro"]').val();
+                const city = modal.find('select[name="cidade"]').val();
+                const state = modal.find('select[name="uf"]').val();
+                const cep = modal.find('input[name="cep"]').val();
+
+                geocodeAddress(street, number, neighborhood, city, state, cep,
+                    (coords) => {
+                        modal.find('input[name="latitude"]').val(coords.lat);
+                        modal.find('input[name="longitude"]').val(coords.lon);
+                    },
+                    (errorMsg) => {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Atenção',
+                            text: errorMsg
+                        });
+                    }
+                );
+            }
+
             citySelect.on('select2:select', function(e) {
                 const ibgeCode = e.params.data.ibge;
                 if (ibgeCode) ibgeInput.val(ibgeCode);
-                geocodeEmitente(modal);
+                handleGeocode(modal);
             });
 
             modal.find('input[name="cep"]').on('blur', function() {
@@ -635,20 +658,8 @@
                 }
             });
         
-            function geocodeEmitente(modal) {
-                const q = `${modal.find('input[name="logradouro"]').val()}, ${modal.find('input[name="numero"]').val()}, ${modal.find('input[name="bairro"]').val()}, ${citySelect.val()}, ${stateSelect.val()}, Brasil`;
-                if (modal.find('input[name="logradouro"]').val() && citySelect.val() && stateSelect.val()) {
-                    $.getJSON(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=1`)
-                        .done(data => {
-                            if (data && data.length > 0) {
-                                modal.find('input[name="latitude"]').val(parseFloat(data[0].lat).toFixed(8));
-                                modal.find('input[name="longitude"]').val(parseFloat(data[0].lon).toFixed(8));
-                            }
-                        });
-                }
-            }
-            modal.find('#buscar_coords').on('click', () => geocodeEmitente(modal));
-            modal.find('input[name="logradouro"], input[name="numero"], input[name="bairro"]').on('blur', () => geocodeEmitente(modal));
+            modal.find('#buscar_coords, #edit_buscar_coords').on('click', () => handleGeocode(modal));
+            modal.find('input[name="logradouro"], input[name="numero"], input[name="bairro"]').on('blur', () => handleGeocode(modal));
             
             modal.data('select2-initialized', true);
         }

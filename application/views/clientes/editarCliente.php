@@ -95,7 +95,7 @@
                             <label for="documento" class="control-label">CPF/CNPJ</label>
                             <div class="controls">
                                 <input id="documento" class="cpfcnpj" type="text" name="documento" value="<?php echo $result->documento; ?>" />
-                                <button id="buscar_info_cnpj" class="btn btn-xs" type="button">Buscar(CNPJ)</button>
+                                <button class="btn btn-xs btn-consultar-cnpj" type="button">Buscar(CNPJ)</button>
                             </div>
                         </div>
                         <div class="control-group">

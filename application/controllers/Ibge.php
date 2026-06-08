@@ -70,9 +70,79 @@ class Ibge extends MY_Controller {
 
         $results = [];
         if ($cities) {
+            // Função para remover acentos e normalizar a string
+            $normalize = function ($string) {
+                $a = 'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýýþÿŔŕ';
+                $b = 'AAAAAAACEEEEIIIIDNOOOOOOUUUUYbsaaaaaaaceeeeiiiidnoooooouuuuyybyRr';
+                $string = utf8_decode($string);
+                $string = strtr($string, utf8_decode($a), $b);
+                $string = strtolower($string);
+                return utf8_encode($string);
+            };
+
+            $isNumericTerm = is_numeric($term);
+
             foreach ($cities as $city) {
-                if (stripos($city['nome'], $term) !== false) {
-                    $results[] = ['id' => $city['nome'], 'text' => $city['nome'], 'ibge' => $city['id']];
+                if ($isNumericTerm) {
+                    if ($city['id'] == $term) {
+                        $results[] = ['id' => $city['id'], 'text' => $city['nome']];
+                    }
+                } else {
+                    $termNormalized = $normalize($term);
+                    if (strpos($normalize($city['nome']), $termNormalized) !== false) {
+                        $results[] = ['id' => $city['id'], 'text' => $city['nome']];
+                    }
+                }
+            }
+        }
+
+        $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode(['results' => $results]));
+    }
+
+    public function consultarCnae()
+    {
+        $term = $this->input->get('term');
+        $cnae_file = FCPATH . 'assets/json/cnae.json';
+        $cnaes = [];
+        $source = 'file';
+
+        if (file_exists($cnae_file)) {
+            $cnaes = json_decode(file_get_contents($cnae_file), true);
+        } else {
+            $url = "https://servicodados.ibge.gov.br/api/v2/cnaes/classes";
+            $response = @file_get_contents($url);
+            if ($response) {
+                file_put_contents($cnae_file, $response);
+                $cnaes = json_decode($response, true);
+                $source = 'api';
+            }
+        }
+
+        $results = [];
+        if ($cnaes && $term) {
+            foreach ($cnaes as $cnae) {
+                $code = '';
+                $desc = '';
+
+                if ($source === 'api') {
+                    if (isset($cnae['id']) && isset($cnae['descricao'])) {
+                        $code = strval($cnae['id']);
+                        $desc = $cnae['descricao'];
+                    }
+                } else {
+                    if (isset($cnae['cod']) && isset($cnae['desc'])) {
+                        $code = $cnae['cod'];
+                        $desc = $cnae['desc'];
+                    }
+                }
+
+                if ($code) {
+                    $id = preg_replace('/[^0-9]/', '', $code);
+                    if (stripos($id, $term) !== false || stripos($desc, $term) !== false || stripos($code, $term) !== false) {
+                        $results[] = ['id' => $id, 'text' => $code . ' - ' . $desc];
+                    }
                 }
             }
         }

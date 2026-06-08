@@ -105,11 +105,15 @@ $(document).ready(function () {
     }
 
     function capital_letter(str) {
-        if (typeof str === 'undefined') { return; }
+        if (typeof str === 'undefined' || str === null) {
+            return '';
+        }
         str = str.toLocaleLowerCase().split(" ");
 
         for (var i = 0, x = str.length; i < x; i++) {
-            str[i] = str[i][0].toUpperCase() + str[i].substr(1);
+            if (str[i]) { // Verifica se a parte da string não é vazia
+                str[i] = str[i][0].toUpperCase() + str[i].substr(1);
+            }
         }
 
         return str.join(" ");
@@ -133,333 +137,271 @@ $(document).ready(function () {
     }
 
     // Valida CNPJ
-     // Função auxiliar para calcular o DV alfanumérico
-   function valorCharAlfanumerico(char) {
-    const ascii = char.charCodeAt(0);
-    return ascii - 48;
+    
+    // Função auxiliar para calcular o DV alfanumérico
+    function valorCharAlfanumerico(char) {
+        const ascii = char.charCodeAt(0);
+        return ascii - 48;
     }
 
     // Função auxiliar para calcular o DV alfanumérico
     function calcularDVAlfanumerico(cnpjBase) {
-    let valores = cnpjBase.split('').map(valorCharAlfanumerico);
+        let valores = cnpjBase.split('').map(valorCharAlfanumerico);
 
-    // Cálculo do 1º DV
-    let pesos1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
-    let soma1 = valores.reduce((acc, val, i) => acc + val * pesos1[i], 0);
-    let resto1 = soma1 % 11;
-    let dv1 = (resto1 === 0 || resto1 === 1) ? 0 : 11 - resto1;
+        // Cálculo do 1º DV
+        let pesos1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+        let soma1 = valores.reduce((acc, val, i) => acc + val * pesos1[i], 0);
+        let resto1 = soma1 % 11;
+        let dv1 = (resto1 === 0 || resto1 === 1) ? 0 : 11 - resto1;
 
-    // Cálculo do 2º DV
-    valores.push(dv1);
-    let pesos2 = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
-    let soma2 = valores.reduce((acc, val, i) => acc + val * pesos2[i], 0);
-    let resto2 = soma2 % 11;
-    let dv2 = (resto2 === 0 || resto2 === 1) ? 0 : 11 - resto2;
+        // Cálculo do 2º DV
+        valores.push(dv1);
+        let pesos2 = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+        let soma2 = valores.reduce((acc, val, i) => acc + val * pesos2[i], 0);
+        let resto2 = soma2 % 11;
+        let dv2 = (resto2 === 0 || resto2 === 1) ? 0 : 11 - resto2;
 
-    return `${dv1}${dv2}`;
-}
+        return `${dv1}${dv2}`;
+    }
 
-function validarCNPJ(cnpj) {
+    function validarCNPJ(cnpj) {
+        
+        cnpj = cnpj.replace(/[^\w]/g, '').toUpperCase();
     
-    cnpj = cnpj.replace(/[^\w]/g, '').toUpperCase();
-
-    // CNPJ numérico tradicional
-    if (/^\d{14}$/.test(cnpj)) {
-        if (/^(\d)\1{13}$/.test(cnpj)) {
-            
+        // CNPJ numérico tradicional
+        if (/^\d{14}$/.test(cnpj)) {
+            if (/^(\d)\1{13}$/.test(cnpj)) {
+                
+                return false;
+            }
+    
+            let tamanho = cnpj.length - 2;
+            let numeros = cnpj.substring(0, tamanho);
+            let digitos = cnpj.substring(tamanho);
+    
+            let soma = 0;
+            let pos = tamanho - 7;
+            for (let i = tamanho; i >= 1; i--) {
+                soma += parseInt(numeros.charAt(tamanho - i)) * pos--;
+                if (pos < 2) pos = 9;
+            }
+    
+            let resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
+            if (resultado != parseInt(digitos.charAt(0))) {
+               
+                return false;
+            }
+    
+            tamanho = tamanho + 1;
+            numeros = cnpj.substring(0, tamanho);
+            soma = 0;
+            pos = tamanho - 7;
+            for (let i = tamanho; i >= 1; i--) {
+                soma += parseInt(numeros.charAt(tamanho - i)) * pos--;
+                if (pos < 2) pos = 9;
+            }
+            resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
+    
+            const valido = resultado == parseInt(digitos.charAt(1));
+            return valido;
+        }
+    
+        // CNPJ alfanumérico
+        if (/^[A-Z0-9]{12}\d{2}$/.test(cnpj)) {
+            let base = cnpj.substring(0, 12);
+            let dv = cnpj.substring(12, 14);
+            const calculado = calcularDVAlfanumerico(base);
+            const valido = calculado === dv;
             return false;
         }
-
-        let tamanho = cnpj.length - 2;
-        let numeros = cnpj.substring(0, tamanho);
-        let digitos = cnpj.substring(tamanho);
-
-        let soma = 0;
-        let pos = tamanho - 7;
-        for (let i = tamanho; i >= 1; i--) {
-            soma += parseInt(numeros.charAt(tamanho - i)) * pos--;
-            if (pos < 2) pos = 9;
-        }
-
-        let resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
-        if (resultado != parseInt(digitos.charAt(0))) {
-           
-            return false;
-        }
-
-        tamanho = tamanho + 1;
-        numeros = cnpj.substring(0, tamanho);
-        soma = 0;
-        pos = tamanho - 7;
-        for (let i = tamanho; i >= 1; i--) {
-            soma += parseInt(numeros.charAt(tamanho - i)) * pos--;
-            if (pos < 2) pos = 9;
-        }
-        resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
-
-        const valido = resultado == parseInt(digitos.charAt(1));
-        return valido;
     }
 
-    // CNPJ alfanumérico
-    if (/^[A-Z0-9]{12}\d{2}$/.test(cnpj)) {
-        let base = cnpj.substring(0, 12);
-        let dv = cnpj.substring(12, 14);
-        const calculado = calcularDVAlfanumerico(base);
-        const valido = calculado === dv;
-        return false;
-    }
-}
-    //finaliza a validação do CNPJ
+    // --- FUNÇÃO DE BUSCA DE CNPJ UNIFICADA ---
+    $(document).on('click', '.btn-consultar-cnpj', function(e) {
+        e.preventDefault();
+        const container = $(this).closest('.modal, form'); // Funciona em modais ou forms diretos
+        
+        // Procura por ambos os nomes de campo de documento
+        const cnpjField = container.find('input[name="cnpj"], input[name="documento"]');
+        const cnpj = cnpjField.val().replace(/\D/g, '');
 
-    $('#buscar_info_cnpj').on('click', function () {
-        // Pega o valor original do campo, sem remover letras
-        var ndocumento = $('#documento').val().trim();
+        if (cnpj.length !== 14) {
+            Swal.fire({ icon: 'error', title: 'Atenção', text: 'CNPJ inválido!' });
+            return;
+        }
 
-        if (validarCNPJ(ndocumento)) {
-            // Se for CNPJ alfanumérico, exibe alerta e não faz requisição
-            if (/^[A-Z0-9]{14}$/.test(ndocumento.replace(/[^A-Z0-9]/g, '')) && /[A-Z]/.test(ndocumento)) {
-                Swal.fire({
-                    icon: "info",
-                    title: "Atenção",
-                    text: "A consulta automática ainda não está disponível para o novo formato de CNPJ alfanumérico. Preencha os dados manualmente."
-                });
+        // Adiciona o efeito de loading
+        const loadingTarget = container.is('.modal') ? container.find('.modal-body') : container;
+        loadingTarget.addClass('loading');
+        
+        // Seta "..." nos campos para indicar carregamento
+        const fieldsToReset = [
+            'input[name="nome"]', 'input[name="nomeCliente"]', 'input[name="cep"]', 
+            'input[name="logradouro"]', 'input[name="rua"]', 'input[name="numero"]', 
+            'input[name="bairro"]', 'input[name="email"]', 'input[name="telefone"]'
+        ].join(', ');
+        container.find(fieldsToReset).val('...');
+
+        $.ajax({
+            url: `https://www.receitaws.com.br/v1/cnpj/${cnpj}`,
+            dataType: 'jsonp',
+            crossDomain: true,
+            timeout: 10000
+        }).done(function(data) {
+            loadingTarget.removeClass('loading');
+
+            if (data.message === "Too Many Requests") {
+                Swal.fire({ icon: 'error', title: 'Atenção', text: 'Você atingiu o limite de 03 consultas de CNPJ por minuto. Por favor, aguarde um minuto antes de tentar novamente.' });
+                container.find('input[type="text"], textarea').val('');
+                container.find('select').val('').trigger('change');
                 return;
             }
 
-        //Nova variável "ndocumento" somente com dígitos.
-        var ndocumento = $('#documento').val().replace(/\D/g, '');
+            if (data.status === 'OK') {
+                // --- Preenchimento de campos ---
+                // Nomes (Razão Social)
+                container.find('input[name="nome"], input[name="nomeCliente"]').val(capital_letter(data.nome));
+                
+                // Endereço
+                container.find('input[name="logradouro"], input[name="rua"]').val(capital_letter(data.logradouro));
+                container.find('input[name="numero"]').val(data.numero);
+                container.find('input[name="bairro"]').val(capital_letter(data.bairro));
+                container.find('input[name="complemento"]').val(capital_letter(data.complemento));
+                
+                // Contato
+                container.find('input[name="telefone"]').val(data.telefone.split('/')[0].replace(/\s/g, ''));
+                container.find('input[name="email"]').val(data.email.toLowerCase());
 
-            //Preenche os campos com "..." enquanto consulta webservice.
-            $("#nomeCliente").val("...");
-            $("#fantasia").val("...");
-            $("#tipo").val("...");
-            $("#email").val("...");
-            $("#cep").val("...");
-            $("#rua").val("...");
-            $("#numero").val("...");
-            $("#bairro").val("...");
-            $("#cidade").val("...");
-            $("#estado").val("...");
-            $("#complemento").val("...");
-            $("#telefone").val("...");
-            $("#cnae").val("...");
-            $("#atividade_principal").val("...");
-            $("#atividades_secundarias").val("...");
-            $("#natureza_juridica").val("...");
+                // --- Campos específicos do Emitente (se existirem) ---
+                container.find('input[name="situacao"]').val(data.situacao);
+                container.find('input[name="porte"]').val(capital_letter(data.porte));
+                container.find('input[name="data_abertura"]').val(data.abertura).mask("00/00/0000");
+                container.find('input[name="data_situacao"]').val(data.data_situacao).mask("00/00/0000");
+                container.find('input[name="natureza_juridica"]').val(data.natureza_juridica);
+                container.find('input[name="capital_social"]').val(data.capital_social).mask("#.##0,00", { reverse: true });
+                container.find('textarea[name="atividade_principal"]').val(data.atividade_principal[0]?.text || '');
+                
+                if (data.qsa && data.qsa.length > 0) {
+                    const qsaText = data.qsa.map(socio => `Sócio: ${socio.nome}\nQualificação: ${socio.qual}`).join('\n\n');
+                    container.find('textarea[name="qsa"]').val(qsaText);
+                }
 
-            $("#situacao").val("...");
-            $("#data_situacao").val("...");
-            $("#motivo_situacao").val("...");
-            $("#situacao_especial").val("...");
-            $("#data_situacao_especial").val("...");
-            $("#data_abertura").val("...");
-            $("#porte").val("...");
-            $("#capital_social").val("...");
-            $("#qsa").val("...");
-            //Consulta o webservice receitaws.com.br/
-            $.ajax({
-                url: "https://www.receitaws.com.br/v1/cnpj/" + ndocumento,
-                dataType: 'jsonp',
-                crossDomain: true,
-                contentType: "text/javascript",
-                success: function (dados) {
-                    if (dados.status == "OK") {
-                        //Atualiza os campos com os valores da consulta.
-                        if ($("#nomeCliente").val() != null) {
-                            $("#nomeCliente").val(capital_letter(dados.nome));
-                        }
-                        if ($("#nomeEmitente").val() != null) {
-                            $("#nomeEmitente").val(capital_letter(dados.nome));
-                        }
-                        
-                        // Ajuste no CEP: Manter hífem (remover apenas pontos)
-                        $("#cep").val(dados.cep ? dados.cep.replace(/\./g, '') : '');
-                        
-                        $("#email").val(dados.email ? dados.email.toLowerCase() : '');
-                        
-                        // Ajuste no Telefone: Adicionar dígito 9 se tiver apenas 10 dígitos (DDD + 8) e for celular
-                        let tel = dados.telefone ? dados.telefone.split("/")[0].replace(/\D/g, '') : '';
-                        if (tel.length === 10) {
-                            // No Brasil, celulares começam com 6, 7, 8 ou 9 após o DDD. Fixo começa com 2, 3, 4 ou 5.
-                            let firstDigit = tel.substring(2, 3);
-                            if (['6', '7', '8', '9'].includes(firstDigit)) {
-                                tel = tel.substring(0, 2) + '9' + tel.substring(2);
-                            }
-                        }
-                        $("#telefone").val(tel);
-                        
-                        // Reaplica a máscara no campo telefone após definir o valor
-                        $('#telefone').trigger('input');
-                        $("#rua").val(dados.logradouro ? capital_letter(dados.logradouro) : '');
-                        $("#numero").val(dados.numero || '');
-                        $("#bairro").val(dados.bairro ? capital_letter(dados.bairro) : '');
-                        $("#cidade").val(dados.municipio ? capital_letter(dados.municipio) : '');
-                        $("#estado").val(dados.uf || '');
-                        $("#complemento").val(dados.complemento ? capital_letter(dados.complemento) : '');
-
-                        // Campos específicos da ReceitaWS
-                        $("#cnae").val(dados.atividade_principal && dados.atividade_principal[0] ? dados.atividade_principal[0].code : '');
-                        $("#atividade_principal").val(dados.atividade_principal && dados.atividade_principal[0] ? capital_letter(dados.atividade_principal[0].text) : '');
-                        $("#atividades_secundarias").val(dados.atividades_secundarias ? dados.atividades_secundarias.map(item => item.text ? capital_letter(item.text) : '').join('\n') : '');
-                        $("#situacao").val(dados.situacao ? capital_letter(dados.situacao) : '');
-                        $("#data_situacao").val(dados.data_situacao ? converterDataParaBR(dados.data_situacao) : '');
-                        $("#motivo_situacao").val(dados.motivo_situacao ? capital_letter(dados.motivo_situacao) : '');
-                        $("#situacao_especial").val(dados.situacao_especial ? capital_letter(dados.situacao_especial) : '');
-                        $("#data_situacao_especial").val(dados.data_situacao_especial ? converterDataParaBR(dados.data_situacao_especial) : '');
-                        $("#data_abertura").val(dados.abertura ? converterDataParaBR(dados.abertura) : '');
-                        $("#natureza_juridica").val(dados.natureza_juridica ? capital_letter(dados.natureza_juridica) : '');
-
-                        $("#tipo").val(dados.tipo ? capital_letter(dados.tipo) : '');
-                        $("#fantasia").val(dados.fantasia ? capital_letter(dados.fantasia) : '');
-                        $("#porte").val(dados.porte ? capital_letter(dados.porte) : '');
-                        $("#capital_social").val(dados.capital_social ? String(dados.capital_social) : '');
-                        $("#qsa").val(dados.qsa ? dados.qsa.map(socio => socio.nome ? capital_letter(socio.nome) : '').join('\n') : '');
-
-                        // Força uma atualizacao do endereco via cep
-                        //document.getElementById("cep").focus();
-                        if ($("#nomeCliente").val() != null) {
-                            document.getElementById("nomeCliente").focus();
-                        }
-                        if ($("#nomeEmitente").val() != null) {
-                            document.getElementById("nomeEmitente").focus();
-                        }
-                    } //end if.
-                    else {
-                        //CNPJ pesquisado não foi encontrado.
-                        if ($("#nomeCliente").val() != null) {
-                            $("#nomeCliente").val("");
-                        }
-                        if ($("#nomeEmitente").val() != null) {
-                            $("#nomeEmitente").val("");
-                        }
-                        $("#cep").val("");
-                        $("#email").val("");
-                        $("#numero").val("");
-                        $("#complemento").val("");
-                        $("#telefone").val("");
-                        $("#rua").val("");
-                        $("#bairro").val("");
-                        $("#cidade").val("");
-                        $("#estado").val("");
-                        $("#cnae").val("");
-                        $("#atividade_principal").val("");
-                        $("#atividades_secundarias").val("");
-                        $("#situacao").val("");
-                        $("#data_situacao").val("");
-                        $("#motivo_situacao").val("");
-                        $("#situacao_especial").val("");
-                        $("#data_situacao_especial").val("");
-                        $("#data_abertura").val("");
-                        $("#natureza_juridica").val("");
-                        $("#tipo").val("");
-                        $("#fantasia").val("");
-                        $("#porte").val("");
-                        $("#capital_social").val("");
-                        $("#qsa").val("");
-
-                        Swal.fire({
-                            type: "warning",
-                            title: "Atenção",
-                            text: "CNPJ não encontrado."
-                        });
+                // Preenche CNAE (se existir)
+                const cnaeSelect = container.find('select[name="cnae"]');
+                if (cnaeSelect.length && data.atividade_principal && data.atividade_principal.length > 0) {
+                    const cnaeData = data.atividade_principal[0];
+                    const cnaeCode = cnaeData.code.replace(/[^0-9]/g, '');
+                    const cnaeDescription = `${cnaeData.code} - ${cnaeData.text}`;
+                    if (cnaeSelect.find("option[value='" + cnaeCode + "']").length === 0) {
+                        const newOption = new Option(cnaeDescription, cnaeCode, true, true);
+                        cnaeSelect.append(newOption);
                     }
-                },
-                error: function () {
-                    //CNPJ pesquisado não foi encontrado.
-                    if ($("#nomeCliente").val() != null) {
-                        $("#nomeCliente").val("");
-                    }
-                    if ($("#nomeEmitente").val() != null) {
-                        $("#nomeEmitente").val("");
-                    }
-                    $("#cep").val("");
-                    $("#email").val("");
-                    $("#numero").val("");
-                    $("#complemento").val("");
-                    $("#telefone").val("");
-                    $("#rua").val("");
-                    $("#bairro").val("");
-                    $("#cidade").val("");
-                    $("#estado").val("");
-                    $("#cnae").val("");
-                    $("#atividade_principal").val("");
-                    $("#atividades_secundarias").val("");
-                    $("#situacao").val("");
-                    $("#data_situacao").val("");
-                    $("#motivo_situacao").val("");
-                    $("#situacao_especial").val("");
-                    $("#data_situacao_especial").val("");
-                    $("#data_abertura").val("");
-                    $("#natureza_juridica").val("");
-                    $("#tipo").val("");
-                    $("#fantasia").val("");
-                    $("#porte").val("");
-                    $("#capital_social").val("");
-                    $("#qsa").val("");
+                    cnaeSelect.val(cnaeCode).trigger('change');
+                }
 
-                    Swal.fire({
-                        type: "warning",
-                        title: "Atenção",
-                        text: "CNPJ não encontrado."
-                    });
-                },
-                timeout: 2000,
-            });
-        } else {
-            Swal.fire({
-                type: "warning",
-                title: "Atenção",
-                text: "CNPJ inválido!"
-            });
-        }
+                // Dispara a busca de CEP para preencher estado, cidade e IBGE
+                const cepField = container.find('input[name="cep"]');
+                if (cepField.length && data.cep) {
+                    cepField.val(data.cep.replace(/\./g, '')).trigger('blur');
+                }
+
+            } else {
+                Swal.fire({ icon: 'error', title: 'Atenção', text: `CNPJ não encontrado: ${data.message}` });
+                container.find('input[type="text"], textarea').val('');
+                container.find('select').val('').trigger('change');
+            }
+        }).fail(function(jqXHR) {
+            loadingTarget.removeClass('loading');
+            container.find('input[type="text"], textarea').val('');
+            container.find('select').val('').trigger('change');
+            
+            let errorMessage = 'Não foi possível consultar o CNPJ. Verifique sua conexão ou tente novamente.';
+            if (jqXHR.status === 429) {
+                errorMessage = 'Você atingiu o limite de 03 consultas de CNPJ por minuto. Por favor, aguarde um minuto antes de tentar novamente.';
+            }
+            
+            Swal.fire({ icon: 'error', title: 'Atenção', text: errorMessage });
+        });
     });
 
     //Quando o campo cep perde o foco.
     $(".cep, #cep").blur(function () {
+        var cepInput = $(this);
+        // Tenta encontrar um contexto próximo, senão usa o body como fallback.
+        var context = cepInput.closest('form, .modal, .widget-content');
+        if (context.length === 0) {
+            context = $('body');
+        }
 
-        //Nova variável "cep" somente com dígitos.
-        var cep = $(this).val().replace(/\D/g, '');
+        var cep = cepInput.val().replace(/\D/g, '');
 
         //Verifica se campo cep possui valor informado.
         if (cep != "") {
-
             //Expressão regular para validar o CEP.
-
             var validacep = /^[0-9]{8}$/;
 
             //Valida o formato do CEP.
-
             if (validacep.test(cep)) {
+                // Seletores mais robustos
+                var ruaInput = context.find('input[name="rua"], input[name="logradouro"]');
+                var bairroInput = context.find('input[name="bairro"]');
+                var estadoSelect = context.find('select[name="uf"]');
+                var cidadeSelect = context.find('select[name="cidade_select"]');
+                var cidadeInput = context.find('input[name="cidade"]');
+                var estadoInput = context.find('input[name="uf"]');
+                var ibgeInput = context.find('input[name="codigo_ibge"]');
 
-                //Preenche os campos com "..." enquanto consulta webservice.
-                $("#rua").val("...");
-                $("#bairro").val("...");
-                $("#cidade").val("...");
-                $("#estado").val("...");
+                // Animação de carregamento
+                ruaInput.val('...');
+                bairroInput.val('...');
+                if (cidadeSelect.length === 0 && cidadeInput.is('input[type="text"]')) cidadeInput.val('...');
+                if (estadoSelect.length === 0 && estadoInput.is('input[type="text"]')) estadoInput.val('...');
 
-                //Consulta o webservice viacep.com.br/
-                $.getJSON("https://viacep.com.br/ws/" + cep.replace(/\./g, '') + "/json/?callback=?", function (dados) {
-
+                $.getJSON(`https://viacep.com.br/ws/${cep}/json/`, function (dados) {
                     if (!("erro" in dados)) {
-                        //Atualiza os campos com os valores da consulta.
-                        $("#rua").val(dados.logradouro);
-                        $("#bairro").val(dados.bairro);
-                        $("#cidade").val(dados.localidade);
-                        $("#estado").val(dados.uf);
-                    } //end if.
-                    else {
-                        //CEP pesquisado não foi encontrado.
+                        ruaInput.val(dados.logradouro);
+                        bairroInput.val(dados.bairro);
+                        if (ibgeInput.length) ibgeInput.val(dados.ibge);
+
+                        // Prioriza Selects se existirem
+                        if (estadoSelect.length) {
+                            estadoSelect.val(dados.uf).trigger('change');
+                        } else {
+                            estadoInput.val(dados.uf);
+                        }
+
+                        if (cidadeSelect.length) {
+                            const cityName = dados.localidade;
+                            const cityIbge = dados.ibge;
+                            
+                            if (cidadeSelect.find(`option[value='${cityIbge}']`).length) {
+                                cidadeSelect.val(cityIbge).trigger('change');
+                            } else {
+                                var newOption = new Option(cityName, cityIbge, true, true);
+                                cidadeSelect.append(newOption).trigger('change');
+                            }
+
+                            cidadeSelect.trigger({
+                                type: 'select2:select',
+                                params: { data: { id: cityIbge, text: cityName } }
+                            });
+
+                            var hiddenCityName = context.find('input[name="cidade"]');
+                            if(hiddenCityName.attr('type') === 'hidden') {
+                                hiddenCityName.val(cityName);
+                            }
+                        } else {
+                            cidadeInput.val(dados.localidade);
+                        }
+                    } else {
                         limpa_formulario_cep();
-                        Swal.fire({
-                            type: "warning",
-                            title: "Atenção",
-                            text: "CEP não encontrado."
-                        });
+                        Swal.fire({ type: 'warning', title: 'Atenção', text: 'CEP não encontrado.' });
                     }
+                }).fail(function() {
+                    limpa_formulario_cep();
+                    Swal.fire({ type: 'error', title: 'Atenção', text: 'Não foi possível consultar o CEP.' });
                 });
-            } //end if.
-            else {
+            } else {
                 //cep é inválido.
                 limpa_formulario_cep();
                 Swal.fire({
@@ -468,11 +410,23 @@ function validarCNPJ(cnpj) {
                     text: "Formato de CEP inválido."
                 });
             }
-        } //end if.
-        else {
+        } else {
             //cep sem valor, limpa formulário.
             limpa_formulario_cep();
         }
+    });
+
+    // Máscara para o campo de pesquisa do Select2 para o campo CNAE
+    $('select[name="cnae"]').on('select2:open', function(e) {
+        setTimeout(() => {
+            // O seletor '.select2-container--open .select2-search__field' garante
+            // que estamos selecionando o campo de busca do select2 que está aberto no momento.
+            const searchField = document.querySelector('.select2-container--open .select2-search__field');
+            if (searchField) {
+                // Aplica a máscara de CNAE.
+                $(searchField).mask('0000-0/00');
+            }
+        }, 50); // Um pequeno atraso para garantir que o campo foi renderizado.
     });
 }); 
 
@@ -480,13 +434,15 @@ function validarCNPJ(cnpj) {
 
 /**
  * Busca coordenadas de geolocalização para um endereço.
- * Tenta primariamente com a API Nominatim e, em caso de falha, usa a API Photon como fallback.
+ * Tenta primariamente com a API Nominatim (busca estruturada), depois Nominatim (busca livre),
+ * e por fim, usa a API Photon como fallback com duas tentativas (com e sem bairro).
  *
  * @param {string} street - O logradouro (rua, avenida, etc.).
  * @param {string} number - O número do endereço.
  * @param {string} neighborhood - O bairro.
  * @param {string} city - A cidade.
  * @param {string} state - O estado (UF).
+ * @param {string} cep - O CEP.
  * @param {function(object): void} successCallback - Função a ser chamada em caso de sucesso. Recebe um objeto com as chaves 'lat' e 'lon'.
  * @param {function(string): void} errorCallback - Função a ser chamada em caso de erro. Recebe uma mensagem de erro.
  */
@@ -498,69 +454,104 @@ function geocodeAddress(street, number, neighborhood, city, state, cep, successC
         return;
     }
 
-    const queries = [
-        `${street}, ${number}, ${neighborhood}, ${city}, ${state}, ${cep}, Brasil`, // Mais específico
-        `${street}, ${number}, ${city}, ${state}, Brasil`, // Menos bairro e cep
-        `${street}, ${city}, ${state}, Brasil` // Apenas rua, cidade e estado
-    ];
+    const fullAddressQuery = `${street}, ${number}, ${neighborhood}, ${city}, ${state}, ${cep}, Brasil`;
+    const addressWithoutNeighborhoodQuery = `${street}, ${number}, ${city}, ${state}, ${cep}, Brasil`;
 
-    let currentQueryIndex = 0;
 
-    function tryNextQuery() {
-        if (currentQueryIndex >= queries.length) {
-            if (errorCallback) {
-                errorCallback('Coordenadas não encontradas. Verifique o endereço.');
-            }
-            return;
-        }
-
-        const encodedQuery = encodeURIComponent(queries[currentQueryIndex]);
-
-        // Tenta com Nominatim primeiro
-        $.getJSON(`https://nominatim.openstreetmap.org/search?format=json&q=${encodedQuery}&limit=1`)
-            .done(data => {
-                if (data && data.length > 0) {
-                    successCallback({
-                        lat: parseFloat(data[0].lat).toFixed(8),
-                        lon: parseFloat(data[0].lon).toFixed(8)
+    // Função auxiliar para chamar a API Photon
+    function geocodeWithPhoton(query, callback, nextFallback) {
+        $.getJSON(`https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&limit=1`)
+            .done(photonData => {
+                if (photonData.features && photonData.features.length > 0) {
+                    callback({
+                        lat: parseFloat(photonData.features[0].geometry.coordinates[1]).toFixed(8),
+                        lon: parseFloat(photonData.features[0].geometry.coordinates[0]).toFixed(8)
                     });
                 } else {
-                    // Fallback para Photon se Nominatim não encontrar
-                    geocodeWithPhoton(encodedQuery, successCallback, () => {
-                        currentQueryIndex++;
-                        tryNextQuery();
-                    });
+                    if (nextFallback) {
+                        nextFallback();
+                    } else if (errorCallback) {
+                        errorCallback('Coordenadas não encontradas via Photon. Verifique o endereço.');
+                    }
                 }
             })
             .fail(() => {
-                // Fallback para Photon se Nominatim falhar
-                geocodeWithPhoton(encodedQuery, successCallback, () => {
-                    currentQueryIndex++;
-                    tryNextQuery();
-                });
+                if (nextFallback) {
+                    nextFallback();
+                } else if (errorCallback) {
+                    errorCallback('Erro ao consultar API Photon. Verifique sua conexão ou tente novamente.');
+                }
             });
     }
 
-    tryNextQuery();
-}
 
-function geocodeWithPhoton(encodedQuery, successCallback, errorCallback) {
-    $.getJSON(`https://photon.komoot.io/api/?q=${encodedQuery}&limit=1`)
-        .done(photonData => {
-            if (photonData.features && photonData.features.length > 0) {
+    // 1. Tentativa Nominatim: Busca puramente estruturada (sem 'q')
+    const nominatimParams1 = {
+        street: `${number} ${street}, ${neighborhood}`,
+        city: city,
+        state: state,
+        postalcode: cep,
+        country: 'Brasil',
+        format: 'json',
+        limit: 1,
+        addressdetails: 1
+    };
+
+    $.getJSON('https://nominatim.openstreetmap.org/search', nominatimParams1)
+        .done(data => {
+            if (data && data.length > 0) {
                 successCallback({
-                    lat: parseFloat(photonData.features[0].geometry.coordinates[1]).toFixed(8),
-                    lon: parseFloat(photonData.features[0].geometry.coordinates[0]).toFixed(8)
+                    lat: parseFloat(data[0].lat).toFixed(8),
+                    lon: parseFloat(data[0].lon).toFixed(8)
                 });
             } else {
-                if (errorCallback) {
-                    errorCallback();
-                }
+                // 2. Tentativa Nominatim: Busca puramente livre (com 'q')
+                $.getJSON(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(fullAddressQuery)}&limit=1`)
+                    .done(data2 => {
+                        if (data2 && data2.length > 0) {
+                            successCallback({
+                                lat: parseFloat(data2[0].lat).toFixed(8),
+                                lon: parseFloat(data2[0].lon).toFixed(8)
+                            });
+                        } else {
+                            // 3. Tentativa Photon: Com bairro
+                            geocodeWithPhoton(fullAddressQuery, successCallback, () => {
+                                // 4. Tentativa Photon: Sem bairro (se a anterior falhar)
+                                geocodeWithPhoton(addressWithoutNeighborhoodQuery, successCallback);
+                            });
+                        }
+                    })
+                    .fail(() => {
+                        // 3. Tentativa Photon: Com bairro (se a segunda Nominatim falhar)
+                        geocodeWithPhoton(fullAddressQuery, successCallback, () => {
+                            // 4. Tentativa Photon: Sem bairro (se a anterior falhar)
+                            geocodeWithPhoton(addressWithoutNeighborhoodQuery, successCallback);
+                        });
+                    });
             }
         })
         .fail(() => {
-            if (errorCallback) {
-                errorCallback();
-            }
+            // 3. Tentativa Photon: Com bairro (se a primeira Nominatim falhar)
+            geocodeWithPhoton(fullAddressQuery, successCallback, () => {
+                // 4. Tentativa Photon: Sem bairro (se a anterior falhar)
+                geocodeWithPhoton(addressWithoutNeighborhoodQuery, successCallback);
+            });
         });
+}
+
+// Função para formatar o código CNAE (XX.XX-X-XX)
+function formatCnae(cnae) {
+    if (!cnae) {
+        return '';
+    }
+    // Remove caracteres não numéricos
+    cnae = String(cnae).replace(/[^0-9]/g, '');
+
+    // Aplica a máscara XXXX-X-XX
+    if (cnae.length === 7) {
+        return cnae.substring(0, 4) + '-' +
+               cnae.substring(4, 5) + '/' +
+               cnae.substring(5, 7);
+    }
+    return cnae; // Retorna como está se o comprimento não for 7
 }

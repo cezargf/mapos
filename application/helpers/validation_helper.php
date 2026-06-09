@@ -170,3 +170,57 @@ if (! function_exists('valid_pix_key')) {
         return false;
     }
 }
+
+if (! function_exists('valid_ie')) {
+    /**
+     * Callback para validação de IE no CodeIgniter Form Validation
+     * 
+     * @param string $ie
+     * @return bool
+     */
+    function valid_ie($ie)
+    {
+        $CI = &get_instance();
+
+        $ie = preg_replace('/[^0-9]/', '', $ie); // Remove caracteres não numéricos
+
+        if (empty($ie)) {
+            // IE é opcional, então vazio é válido
+            return true;
+        }
+
+        if (strlen($ie) >= 8 && strlen($ie) <= 14) {
+            return true;
+        } else {
+            $CI->form_validation->set_message('valid_ie', 'O campo %s deve conter entre 8 e 14 dígitos');
+            return false;
+        }
+    }
+}
+
+if (! function_exists('valid_im')) {
+    /**
+     * Callback para validação de IM no CodeIgniter Form Validation
+     * 
+     * @param string $im
+     * @return bool
+     */
+    function valid_im($im)
+    {
+        $CI = &get_instance();
+
+        $im = preg_replace('/[^0-9]/', '', $im); // Remove caracteres não numéricos
+
+        if (empty($im)) {
+            // IM é opcional, então vazio é válido
+            return true;
+        }
+
+        if (strlen($im) >= 5 && strlen($im) <= 20) {
+            return true;
+        } else {
+            $CI->form_validation->set_message('valid_im', 'O campo %s deve conter entre 5 e 20 dígitos');
+            return false;
+        }
+    }
+}

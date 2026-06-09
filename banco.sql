@@ -575,23 +575,39 @@ DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 -- -----------------------------------------------------
 -- Table `emitente`
 -- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `emitente` (
-  `id` INT NOT NULL AUTO_INCREMENT ,
-  `nome` VARCHAR(255) NULL ,
-  `cnpj` VARCHAR(45) NULL ,
-  `ie` VARCHAR(50) NULL ,
-  `rua` VARCHAR(70) NULL ,
-  `numero` VARCHAR(15) NULL ,
-  `bairro` VARCHAR(45) NULL ,
-  `cidade` VARCHAR(45) NULL ,
-  `uf` VARCHAR(20) NULL ,
-  `telefone` VARCHAR(20) NULL ,
-  `email` VARCHAR(255) NULL ,
-  `url_logo` VARCHAR(225) NULL ,
-  `cep` VARCHAR(20) NULL ,
-  PRIMARY KEY (`id`) )
-ENGINE = InnoDB
-DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+CREATE TABLE IF NOT EXISTS `emitente` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `nome` varchar(255) DEFAULT NULL,
+  `cnpj` varchar(18) DEFAULT NULL,
+  `ie` varchar(20) DEFAULT NULL,
+  `im` varchar(20) DEFAULT NULL,
+  `cnae` varchar(10) DEFAULT NULL,
+  `atividade_principal` text,
+  `situacao` varchar(50) DEFAULT NULL,
+  `data_situacao` date DEFAULT NULL,
+  `data_abertura` date DEFAULT NULL,
+  `natureza_juridica` varchar(100) DEFAULT NULL,
+  `porte` varchar(50) DEFAULT NULL,
+  `capital_social` decimal(15,2) DEFAULT NULL,
+  `qsa` text,
+  `rua` varchar(255) DEFAULT NULL,
+  `numero` varchar(10) DEFAULT NULL,
+  `complemento` varchar(255) DEFAULT NULL,
+  `bairro` varchar(100) DEFAULT NULL,
+  `cidade` varchar(100) DEFAULT NULL,
+  `uf` varchar(20) DEFAULT NULL,
+  `cep` varchar(10) DEFAULT NULL,
+  `codigo_ibge` varchar(10) DEFAULT NULL,
+  `numero_nfe` int(11) NOT NULL DEFAULT '0',
+  `numero_nfce` int(11) NOT NULL DEFAULT '0',
+  `telefone` varchar(25) DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `email_contador` varchar(255) DEFAULT NULL,
+  `url_logo` varchar(225) DEFAULT NULL,
+  `latitude` varchar(50) DEFAULT NULL,
+  `longitude` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- -----------------------------------------------------
 -- Table `email_queue`

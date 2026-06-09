@@ -203,37 +203,54 @@ class Mapos extends MY_Controller
         }
 
         $this->load->library('form_validation');
-        $this->form_validation->set_rules('nome', 'Razão Social', 'required|trim');
-        $this->form_validation->set_rules('cnpj', 'CNPJ', 'required|trim');
-        $this->form_validation->set_rules('ie', 'IE', 'trim');
-        $this->form_validation->set_rules('cep', 'CEP', 'required|trim');
-        $this->form_validation->set_rules('logradouro', 'Logradouro', 'required|trim');
-        $this->form_validation->set_rules('numero', 'Número', 'required|trim');
-        $this->form_validation->set_rules('bairro', 'Bairro', 'required|trim');
-        $this->form_validation->set_rules('cidade', 'Cidade', 'required|trim');
-        $this->form_validation->set_rules('uf', 'UF', 'required|trim');
-        $this->form_validation->set_rules('telefone', 'Telefone', 'required|trim');
-        $this->form_validation->set_rules('email', 'E-mail', 'required|trim');
-
-        if ($this->form_validation->run() == false) {
-            $this->session->set_flashdata('error', 'Campos obrigatórios não foram preenchidos.');
+        if ($this->form_validation->run('emitente') == false) {
+            $this->session->set_flashdata('error', 'Campos obrigatórios não foram preenchidos: ' . validation_errors());
             redirect(site_url('mapos/emitente'));
         } else {
             $nome = $this->input->post('nome');
             $cnpj = $this->input->post('cnpj');
             $ie = $this->input->post('ie');
+            $im = $this->input->post('im');
             $cep = $this->input->post('cep');
             $logradouro = $this->input->post('logradouro');
             $numero = $this->input->post('numero');
+            $complemento = $this->input->post('complemento');
             $bairro = $this->input->post('bairro');
             $cidade = $this->input->post('cidade');
             $uf = $this->input->post('uf');
             $telefone = $this->input->post('telefone');
             $email = $this->input->post('email');
+            $email_contador = $this->input->post('email_contador');
+            $codigo_ibge = $this->input->post('codigo_ibge');
+            $numero_nfe = $this->input->post('numero_nfe') ?: 0;
+            $numero_nfce = $this->input->post('numero_nfce') ?: 0;
+            $cnae = $this->input->post('cnae');
+            $atividade_principal = $this->input->post('atividade_principal');
+            $situacao = $this->input->post('situacao');
+            $data_situacao = $this->input->post('data_situacao');
+            if ($data_situacao) {
+                $dt = explode('/', $data_situacao);
+                if (count($dt) == 3) {
+                    $data_situacao = $dt[2] . '-' . $dt[1] . '-' . $dt[0];
+                }
+            }
+            $data_abertura = $this->input->post('data_abertura');
+            if ($data_abertura) {
+                $dt = explode('/', $data_abertura);
+                if (count($dt) == 3) {
+                    $data_abertura = $dt[2] . '-' . $dt[1] . '-' . $dt[0];
+                }
+            }
+            $natureza_juridica = $this->input->post('natureza_juridica');
+            $porte = $this->input->post('porte');
+            $capital_social = $this->input->post('capital_social');
+            $qsa = $this->input->post('qsa');
+            $latitude = $this->input->post('latitude');
+            $longitude = $this->input->post('longitude');
             $image = $this->do_upload();
             $logo = base_url() . 'assets/uploads/' . $image;
 
-            $retorno = $this->mapos_model->addEmitente($nome, $cnpj, $ie, $cep, $logradouro, $numero, $bairro, $cidade, $uf, $telefone, $email, $logo);
+            $retorno = $this->mapos_model->addEmitente($nome, $cnpj, $ie, $im, $cep, $logradouro, $numero, $complemento, $bairro, $cidade, $uf, $telefone, $email, $logo, $cnae, $atividade_principal, $situacao, $data_situacao, $data_abertura, $natureza_juridica, $porte, $capital_social, $qsa, $email_contador, $codigo_ibge, $numero_nfe, $numero_nfce, $latitude, $longitude);
             if ($retorno) {
                 $this->session->set_flashdata('success', 'As informações foram inseridas com sucesso.');
                 log_info('Adicionou informações de emitente.');
@@ -252,36 +269,53 @@ class Mapos extends MY_Controller
         }
 
         $this->load->library('form_validation');
-        $this->form_validation->set_rules('nome', 'Razão Social', 'required|trim');
-        $this->form_validation->set_rules('cnpj', 'CNPJ', 'required|trim');
-        $this->form_validation->set_rules('ie', 'IE', 'trim');
-        $this->form_validation->set_rules('cep', 'CEP', 'required|trim');
-        $this->form_validation->set_rules('logradouro', 'Logradouro', 'required|trim');
-        $this->form_validation->set_rules('numero', 'Número', 'required|trim');
-        $this->form_validation->set_rules('bairro', 'Bairro', 'required|trim');
-        $this->form_validation->set_rules('cidade', 'Cidade', 'required|trim');
-        $this->form_validation->set_rules('uf', 'UF', 'required|trim');
-        $this->form_validation->set_rules('telefone', 'Telefone', 'required|trim');
-        $this->form_validation->set_rules('email', 'E-mail', 'required|trim');
-
-        if ($this->form_validation->run() == false) {
-            $this->session->set_flashdata('error', 'Campos obrigatórios não foram preenchidos.');
+        if ($this->form_validation->run('emitente') == false) {
+            $this->session->set_flashdata('error', 'Campos obrigatórios não foram preenchidos: ' . validation_errors());
             redirect(site_url('mapos/emitente'));
         } else {
             $nome = $this->input->post('nome');
             $cnpj = $this->input->post('cnpj');
             $ie = $this->input->post('ie');
+            $im = $this->input->post('im');
             $cep = $this->input->post('cep');
             $logradouro = $this->input->post('logradouro');
             $numero = $this->input->post('numero');
+            $complemento = $this->input->post('complemento');
             $bairro = $this->input->post('bairro');
             $cidade = $this->input->post('cidade');
             $uf = $this->input->post('uf');
             $telefone = $this->input->post('telefone');
             $email = $this->input->post('email');
+            $email_contador = $this->input->post('email_contador');
+            $codigo_ibge = $this->input->post('codigo_ibge');
+            $numero_nfe = $this->input->post('numero_nfe') ?: 0;
+            $numero_nfce = $this->input->post('numero_nfce') ?: 0;
+            $cnae = $this->input->post('cnae');
+            $atividade_principal = $this->input->post('atividade_principal');
+            $situacao = $this->input->post('situacao');
+            $data_situacao = $this->input->post('data_situacao');
+            if ($data_situacao) {
+                $dt = explode('/', $data_situacao);
+                if (count($dt) == 3) {
+                    $data_situacao = $dt[2] . '-' . $dt[1] . '-' . $dt[0];
+                }
+            }
+            $data_abertura = $this->input->post('data_abertura');
+            if ($data_abertura) {
+                $dt = explode('/', $data_abertura);
+                if (count($dt) == 3) {
+                    $data_abertura = $dt[2] . '-' . $dt[1] . '-' . $dt[0];
+                }
+            }
+            $natureza_juridica = $this->input->post('natureza_juridica');
+            $porte = $this->input->post('porte');
+            $capital_social = $this->input->post('capital_social');
+            $qsa = $this->input->post('qsa');
+            $latitude = $this->input->post('latitude');
+            $longitude = $this->input->post('longitude');
             $id = $this->input->post('id');
 
-            $retorno = $this->mapos_model->editEmitente($id, $nome, $cnpj, $ie, $cep, $logradouro, $numero, $bairro, $cidade, $uf, $telefone, $email);
+            $retorno = $this->mapos_model->editEmitente($id, $nome, $cnpj, $ie, $im, $cep, $logradouro, $numero, $complemento, $bairro, $cidade, $uf, $telefone, $email, $cnae, $atividade_principal, $situacao, $data_situacao, $data_abertura, $natureza_juridica, $porte, $capital_social, $qsa, $email_contador, $codigo_ibge, $numero_nfe, $numero_nfce, $latitude, $longitude);
             if ($retorno) {
                 $this->session->set_flashdata('success', 'As informações foram alteradas com sucesso.');
                 log_info('Alterou informações de emitente.');

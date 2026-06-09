@@ -453,4 +453,75 @@ $config = [
             'rules' => 'required|trim',
         ],
     ],
+    'emitente' => [
+        [
+            'field' => 'nome',
+            'label' => 'Razão Social',
+            'rules' => 'required|trim|max_length[255]',
+        ],
+        [
+            'field' => 'cnpj',
+            'label' => 'CNPJ',
+            'rules' => 'required|trim|max_length[18]|verific_cpf_cnpj',
+            'errors' => [
+                'verific_cpf_cnpj' => 'O campo %s deve conter um CNPJ válido.',
+            ],
+        ],
+        [
+            'field' => 'ie',
+            'label' => 'Inscrição Estadual',
+            'rules' => 'trim|max_length[20]|valid_ie',
+            'errors' => [
+                'valid_ie' => 'O campo %s deve conter uma Inscrição Estadual válida.',
+            ],
+        ],
+        [
+            'field' => 'im',
+            'label' => 'Inscrição Municipal',
+            'rules' => 'trim|min_length[5]|max_length[20]|valid_im',
+            'errors' => [
+                'valid_im' => 'O campo %s deve conter uma Inscrição Municipal válida.',
+            ],
+        ],
+        [
+            'field' => 'logradouro',
+            'label' => 'Logradouro',
+            'rules' => 'required|trim|max_length[255]',
+        ],
+        [
+            'field' => 'numero',
+            'label' => 'Número',
+            'rules' => 'required|trim|max_length[10]',
+        ],
+        [
+            'field' => 'bairro',
+            'label' => 'Bairro',
+            'rules' => 'required|trim|max_length[100]',
+        ],
+        [
+            'field' => 'cidade',
+            'label' => 'Cidade',
+            'rules' => 'required|trim|max_length[100]',
+        ],
+        [
+            'field' => 'uf',
+            'label' => 'UF',
+            'rules' => 'required|trim|max_length[2]',
+        ],
+        [
+            'field' => 'cep',
+            'label' => 'CEP',
+            'rules' => 'required|trim|max_length[10]',
+        ],
+        [
+            'field' => 'telefone',
+            'label' => 'Telefone',
+            'rules' => 'required|trim|max_length[25]',
+        ],
+        [
+            'field' => 'email',
+            'label' => 'Email',
+            'rules' => 'required|trim|valid_email|max_length[255]',
+        ],
+    ],
 ];

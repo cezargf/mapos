@@ -20,17 +20,28 @@
         overflow-y: auto !important;
         padding: 20px;
     }
+    .form-horizontal .control-group {
+        display: flex;
+        align-items: flex-start;
+    }
     .form-horizontal .control-label {
+        width: 180px;
+        text-align: right;
         padding-right: 20px;
     }
     .form-horizontal .controls {
-        margin-left: 20px;
-        position: relative;
+        display: inline-flex;
+        flex: 1;
+        max-width: 100%;
+        margin-left: 0;
+        margin-right: 20px;
     }
-    .form-horizontal .control-group {
-        border-top: 0 solid #ffffff;
-        border-bottom: 0 solid #eeeeee;
-        margin-bottom: 0;
+    .form-horizontal .controls input,
+    .form-horizontal .controls select,
+    .form-horizontal .controls .select2-container--default,
+    .form-horizontal .controls textarea {
+        max-width: none;
+        width: 100% !important;
     }
     .modal-body .required {
         color: red;
@@ -65,47 +76,54 @@
         margin-top: -10px !important; /* Added to remove space */
     }
 
-    /* --- Form Fields Style --- */
-    .form-horizontal .controls select,
-    .form-horizontal .controls textarea,
-    .select2-container .select2-selection--single {
-        background-color: #e6e9f3 !important; /* More aggressive selector */
-        border: 1px solid #b1b9be; /* Added for consistency */
-    }
-
     /* --- Font-Size Standardization --- */
     .form-horizontal .controls select,
-    .select2-container--default .select2-selection--single .select2-selection__rendered,
-    .select2-results__option {
+    .select2-container--default,
+    .select2-container--default .select2-selection--single,
+    .select2-container--default .select2-selection--multiple,
+    .select2-container--default .select2-results__option {
         font-size: 14px !important;
     }
-    
-    .select2-container--default .select2-selection--single .select2-selection__arrow {
-        top: 2px !important;
+    .select2-container--default {
+        height: 30px;
     }
-    .select2-container.error .select2-selection--single {
-        border-color: #b94a48 !important;
+    .select2-container--default .select2-selection--single {
+        height: auto;
+    }
+    .select2-search__field {
+        height: 28px !important;
     }
 
     /* --- CNPJ/Document Field --- */
-    .btn-cnpj-search {
+    .control-group.documento-group .controls {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+    .cnpjEmitente {
+        flex: 1;
+    }
+    .btn-consultar-cnpj {
         position: relative;
-        margin-left: 8px;
+        margin: 0 0 0 8px !important;
     }
 
+    /* --- Geo Group --- */
+    .control-group.geo-group {
+        display: block;
+    }
+    .control-group.geo-group .controls {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+    
+    /* --- Geo Location Buttons --- */
     .geo-buttons {
         display:flex;
-        justify-content: center;
-        width: 100%;
-        height: 30px;
-        gap: 10px;
-        margin-top: 10px;
-    }
-
-    .geo-buttons .btn {
-        padding: 4px 8px;
-        font-size: 12px;
-        width: 150px;
+        justify-content: right;
+        gap: 5px;
+        margin: 0 20px 0 0;
     }
 
     /* --- Loading State --- */
@@ -136,45 +154,19 @@
             padding: 10px;
             overflow-x: hidden !important;
         }
+        .form-horizontal .control-group {
+            flex-direction: column;
+        }
+        .form-horizontal .control-group .controls {
+            margin-left: 0;
+            margin-right: 0;
+            width: 100%;
+        }
         .form-horizontal .control-label {
             display: block;
             width: auto;
             text-align: left;
             margin-bottom: -6px;
-        }
-        .form-horizontal .control-group .controls {
-            display: flex;
-            flex-direction: column;
-            margin-left: 0;
-        }
-        .form-horizontal .controls input,
-        .form-horizontal .controls select,
-        .form-horizontal .controls textarea,
-        .select2-container, .select2-container .select2-selection--single {
-            height: auto;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        
-        /* CNPJ Button */
-        .control-group.documento-group .controls {
-            flex-direction: row;
-            align-items: center;
-        }
-        .cnpjEmitente {
-            flex: 1;
-        }
-        .btn-cnpj-search {
-            position: static;
-            margin-left: 8px;
-            padding: 6px 10px; /* Larger touch area */
-        }
-
-        /* Geo Fields */
-        .geo-buttons .btn {
-            padding: 4px 6px;
-            font-size: 11px;
-            width: 100%;
         }
     }
 </style>
@@ -213,7 +205,9 @@
                         <label for="documento" class="control-label">CNPJ<span class="required">*</span></label>
                         <div class="controls">
                             <input class="cnpjEmitente" placeholder="00.000.000/0000-00" id="documento" type="text" name="cnpj" value="" title="CNPJ: Cadastro Nacional da Pessoa Jurídica. Campo obrigatório, formato: 00.000.000/0000-00. Para ocultar o CNPJ digite 00.000.000/000-00" />
-                            <button class="btn btn-xs btn-cnpj-search btn-consultar-cnpj" type="button"><i class="fas fa-search"></i></button>
+                            <button class="button btn btn-mini btn-inverse btn-consultar-cnpj" type="button">
+                                <span class="button__icon"><i class="fas fa-search"></i></span>
+                            </button>
                         </div>
                     </div>
                     <div class="control-group">
@@ -285,7 +279,7 @@
                             <input id="bairro" type="text" placeholder="Nome do bairro" name="bairro" value="" title="Bairro: Nome do bairro. Campo obrigatório." />
                         </div>
                     </div>
-                    <div class="control-group">
+                    <div class="control-group geo-group">
                         <label for="latitude" class="control-label">Latitude</label>
                         <div class="controls">
                             <input id="latitude" type="text" name="latitude" value="" placeholder="Latitude" title="Latitude: Coordenada geográfica de latitude. Preenchido automaticamente." readonly />
@@ -295,8 +289,14 @@
                             <input id="longitude" type="text" name="longitude" value="" placeholder="Longitude" title="Longitude: Coordenada geográfica de longitude. Preenchido automaticamente." readonly />
                         </div>
                         <div class="geo-buttons">
-                            <button type="button" id="buscar_coords" class="btn btn-mini btn-info" title="Tentar encontrar automaticamente pelo endereço"><i class="fas fa-search"></i> Buscar Coordenadas</button>
-                            <button type="button" class="btn btn-mini btn-primary open-map-button" title="Definir localização no mapa"><i class="fas fa-map-marker-alt"></i> Definir no Mapa</button>
+                            <button type="button" id="buscar_coords" class="button btn btn-mini btn-info" title="Tentar encontrar automaticamente pelo endereço">
+                                <span class="button__icon"><i class="bx bx-search-alt"></i></span>
+                                <span class="button__text2">Buscar</span>
+                            </button>
+                            <button type="button" class="button btn btn-mini btn-primary open-map-button" title="Definir localização no mapa">
+                                <span class="button__icon"><i class="bx bx-map-alt"></i></span>
+                                <span class="button__text2">Definir</span>
+                            </button>
                         </div>
                     </div>
                 </fieldset>
@@ -461,7 +461,9 @@
                         <label for="edit_documento" class="control-label">CNPJ<span class="required">*</span></label>
                         <div class="controls">
                             <input class="cnpjEmitente" type="text" id="edit_documento" name="cnpj" value="<?= $dados->cnpj; ?>" placeholder="00.000.000/0000-00" title="CNPJ: Cadastro Nacional da Pessoa Jurídica. Campo obrigatório, formato: 00.000.000/0000-00. Para ocultar o CNPJ digite 00.000.000/000-00" />
-                            <button class="btn btn-xs btn-cnpj-search btn-consultar-cnpj" type="button"><i class="fas fa-search"></i></button>
+                            <button class="button btn btn-mini btn-inverse btn-consultar-cnpj" type="button">
+                                <span class="button__icon"><i class="bx bx-search-alt"></i></span>
+                            </button>
                         </div>
                     </div>
                     <div class="control-group">
@@ -534,7 +536,7 @@
                             <input type="text" id="edit_bairro" name="bairro" value="<?= $dados->bairro; ?>" placeholder="Nome do bairro" title="Bairro: Nome do bairro. Campo obrigatório." />
                         </div>
                     </div>
-                    <div class="control-group">
+                    <div class="control-group geo-group">
                         <label for="edit_latitude" class="control-label">Latitude</label>
                         <div class="controls">
                             <input id="edit_latitude" type="text" name="latitude" value="<?= $dados->latitude ?? ''; ?>" placeholder="Latitude" title="Latitude: Coordenada geográfica de latitude. Preenchido automaticamente." readonly />
@@ -544,8 +546,14 @@
                             <input id="edit_longitude" type="text" name="longitude" value="<?= $dados->longitude ?? ''; ?>" placeholder="Longitude" title="Longitude: Coordenada geográfica de longitude. Preenchido automaticamente." readonly />
                         </div>
                         <div class="geo-buttons">
-                            <button type="button" id="edit_buscar_coords" class="btn btn-mini btn-info" title="Tentar encontrar automaticamente pelo endereço"><i class="fas fa-search"></i> Buscar Coordenadas</button>
-                            <button type="button" class="btn btn-mini btn-primary open-map-button" title="Definir localização no mapa"><i class="fas fa-map-marker-alt"></i> Definir no Mapa</button>
+                            <button type="button" id="edit_buscar_coords" class="button btn btn-mini btn-info" title="Tentar encontrar automaticamente pelo endereço">
+                                <span class="button__icon"><i class="bx bx-search-alt"></i></span>
+                                <span class="button__text2">Buscar</span>
+                            </button>
+                            <button type="button" class="button btn btn-mini btn-primary open-map-button" title="Definir localização no mapa">
+                                <span class="button__icon"><i class="bx bx-map-alt"></i></span>
+                                <span class="button__text2">Definir</span>
+                            </button>
                         </div>
                     </div>
                 </fieldset>
@@ -788,6 +796,15 @@
                         };
                     },
                     cache: true
+                },
+                templateSelection: function(data) {
+                    if (!data.id) return data.text;
+                    // Se for um item já formatado (ex: carregamento inicial), retorna como está
+                    if (data.text.indexOf(' - ') === -1 && data.text.indexOf('-') > -1) return data.text;
+                    
+                    // Extrai apenas o código, limpa espaços e aplica a máscara
+                    const codeOnly = data.text.split('-')[0].trim();
+                    return formatCnae(codeOnly);
                 }
             });
 
@@ -934,10 +951,10 @@
 
             citySelect.on('select2:select', function(e) {
                 const selectedData = e.params.data;
-                const ibgeCode = selectedData.id;
-                const cityName = selectedData.text;
+                const ibgeCode = selectedData.ibge || selectedData.id;
+                const cityName = selectedData.text || selectedData.id;
 
-                if (ibgeCode) {
+                if (ibgeCode && /^\d+$/.test(ibgeCode)) {
                     ibgeInput.val(ibgeCode);
                 }
                 modal.find('input[name="cidade"]').val(cityName || '');

@@ -45,7 +45,7 @@ $(document).ready(function () {
     if ($("[name='idClientes']").val()) {
         $("#nomeCliente").focus();
     } else {
-        $("#documento").focus();
+        $("#documento").focus().select();
     }
 
     // Máscara dinâmica para CPF, CNPJ tradicional e CNPJ alfanumérico
@@ -200,14 +200,16 @@ $(document).ready(function () {
             let dv = cnpj.substring(12, 14);
             const calculado = calcularDVAlfanumerico(base);
             const valido = calculado === dv;
-            return false;
+            return valido;
         }
     }
 
     // --- FUNÇÃO DE BUSCA DE CNPJ UNIFICADA ---
     $(document).on('click', '.btn-consultar-cnpj', function(e) {
         e.preventDefault();
-        const container = $(this).closest('.modal, form'); // Funciona em modais ou forms diretos
+        // Prioriza o modal como container para garantir que o loading seja aplicado no .modal-body.
+        const modal = $(this).closest('.modal');
+        const container = modal.length ? modal : $(this).closest('form');
         
         // Procura por ambos os nomes de campo de documento
         const cnpjField = container.find('input[name="cnpj"], input[name="documento"]');
@@ -219,7 +221,7 @@ $(document).ready(function () {
         }
 
         // Adiciona o efeito de loading
-        const loadingTarget = container.is('.modal') ? container.find('.modal-body') : container;
+        const loadingTarget = container.is('.modal') ? container.find('.modal-body').first() : container;
         loadingTarget.addClass('loading');
         
         // Seta "..." nos campos para indicar carregamento
@@ -247,44 +249,57 @@ $(document).ready(function () {
 
             if (data.status === 'OK') {
                 // --- Preenchimento de campos ---
-                // Nomes (Razão Social)
-                container.find('input[name="nome"], input[name="nomeCliente"]').val(capital_letter(data.nome));
+                // Nomes (Razão Social e Fantasia)
+                container.find('[name="nome"], [name="nomeCliente"]').val(capital_letter(data.nome));
+                container.find('[name="fantasia"]').val(capital_letter(data.fantasia));
                 
                 // Endereço
-                container.find('input[name="logradouro"], input[name="rua"]').val(capital_letter(data.logradouro));
-                container.find('input[name="numero"]').val(data.numero);
-                container.find('input[name="bairro"]').val(capital_letter(data.bairro));
-                container.find('input[name="complemento"]').val(capital_letter(data.complemento));
+                container.find('[name="logradouro"], [name="rua"]').val(capital_letter(data.logradouro));
+                container.find('[name="numero"]').val(data.numero);
+                container.find('[name="bairro"]').val(capital_letter(data.bairro));
+                container.find('[name="complemento"]').val(capital_letter(data.complemento));
                 
                 // Contato
-                container.find('input[name="telefone"]').val(data.telefone.split('/')[0].replace(/\s/g, ''));
-                container.find('input[name="email"]').val(data.email.toLowerCase());
+                container.find('[name="telefone"]').val(data.telefone.split('/')[0].replace(/\s/g, ''));
+                container.find('[name="email"]').val(data.email.toLowerCase());
 
-                // --- Campos específicos do Emitente (se existirem) ---
-                container.find('input[name="situacao"]').val(data.situacao);
-                container.find('input[name="porte"]').val(capital_letter(data.porte));
-                container.find('input[name="data_abertura"]').val(data.abertura).mask("00/00/0000");
-                container.find('input[name="data_situacao"]').val(data.data_situacao).mask("00/00/0000");
-                container.find('input[name="natureza_juridica"]').val(data.natureza_juridica);
-                container.find('input[name="capital_social"]').val(data.capital_social).mask("#.##0,00", { reverse: true });
-                container.find('textarea[name="atividade_principal"]').val(data.atividade_principal[0]?.text || '');
+                // --- Campos específicos ---
+                container.find('[name="situacao"]').val(data.situacao);
+                container.find('[name="porte"]').val(capital_letter(data.porte));
+                container.find('[name="data_abertura"]').val(data.abertura).mask("00/00/0000");
+                container.find('[name="data_situacao"]').val(data.data_situacao).mask("00/00/0000");
+                container.find('[name="motivo_situacao"]').val(data.motivo_situacao);
+                container.find('[name="situacao_especial"]').val(data.situacao_especial);
+                container.find('[name="data_situacao_especial"]').val(data.data_situacao_especial).mask("00/00/0000");
+                container.find('[name="natureza_juridica"]').val(data.natureza_juridica);
+                container.find('[name="capital_social"]').val(data.capital_social).mask("#.##0,00", { reverse: true });
+                
+                // Atividades (Principal e Secundárias)
+                container.find('[name="atividade_principal"]').val(data.atividade_principal[0]?.text || '');
+                if (data.atividades_secundarias && data.atividades_secundarias.length > 0) {
+                    const secundariasText = data.atividades_secundarias.map(a => a.text).join('\n');
+                    container.find('[name="atividades_secundarias"]').val(secundariasText);
+                }
                 
                 if (data.qsa && data.qsa.length > 0) {
                     const qsaText = data.qsa.map(socio => `Sócio: ${socio.nome}\nQualificação: ${socio.qual}`).join('\n\n');
-                    container.find('textarea[name="qsa"]').val(qsaText);
+                    container.find('[name="qsa"]').val(qsaText);
                 }
 
-                // Preenche CNAE (se existir)
+                // Preenche CNAE (se for select/Select2)
                 const cnaeSelect = container.find('select[name="cnae"]');
                 if (cnaeSelect.length && data.atividade_principal && data.atividade_principal.length > 0) {
                     const cnaeData = data.atividade_principal[0];
                     const cnaeCode = cnaeData.code.replace(/[^0-9]/g, '');
-                    const cnaeDescription = `${cnaeData.code} - ${cnaeData.text}`;
+                    const cnaeCodeFormatted = formatCnae(cnaeCode);
                     if (cnaeSelect.find("option[value='" + cnaeCode + "']").length === 0) {
-                        const newOption = new Option(cnaeDescription, cnaeCode, true, true);
+                        const newOption = new Option(cnaeCodeFormatted, cnaeCode, true, true);
                         cnaeSelect.append(newOption);
                     }
                     cnaeSelect.val(cnaeCode).trigger('change');
+                } else {
+                    // Fallback para input de texto
+                    container.find('input[name="cnae"]').val(data.atividade_principal[0]?.code.replace(/[^0-9]/g, ''));
                 }
 
                 // Dispara a busca de CEP para preencher estado, cidade e IBGE
@@ -362,16 +377,17 @@ $(document).ready(function () {
                             const cityName = dados.localidade;
                             const cityIbge = dados.ibge;
                             
-                            if (cidadeSelect.find(`option[value='${cityIbge}']`).length) {
-                                cidadeSelect.val(cityIbge).trigger('change');
+                            if (cidadeSelect.find(`option[value='${cityName}']`).length) {
+                                cidadeSelect.val(cityName).trigger('change');
                             } else {
-                                var newOption = new Option(cityName, cityIbge, true, true);
+                                var newOption = new Option(cityName, cityName, true, true);
+                                $(newOption).attr('data-ibge', cityIbge);
                                 cidadeSelect.append(newOption).trigger('change');
                             }
 
                             cidadeSelect.trigger({
                                 type: 'select2:select',
-                                params: { data: { id: cityIbge, text: cityName } }
+                                params: { data: { id: cityName, text: cityName, ibge: cityIbge } }
                             });
 
                             var hiddenCityName = context.find('input[name="cidade"]');

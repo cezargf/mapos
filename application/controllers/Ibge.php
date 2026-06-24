@@ -85,12 +85,20 @@ class Ibge extends MY_Controller {
             foreach ($cities as $city) {
                 if ($isNumericTerm) {
                     if ($city['id'] == $term) {
-                        $results[] = ['id' => $city['id'], 'text' => $city['nome']];
+                        $results[] = [
+                            'id' => $city['nome'], 
+                            'text' => $city['nome'], 
+                            'ibge' => $city['id']
+                        ];
                     }
                 } else {
                     $termNormalized = $normalize($term);
                     if (strpos($normalize($city['nome']), $termNormalized) !== false) {
-                        $results[] = ['id' => $city['id'], 'text' => $city['nome']];
+                        $results[] = [
+                            'id' => $city['nome'], 
+                            'text' => $city['nome'], 
+                            'ibge' => $city['id']
+                        ];
                     }
                 }
             }

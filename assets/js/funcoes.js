@@ -559,3 +559,19 @@ function formatCnae(cnae) {
     }
     return cnae; // Retorna como está se o comprimento não for 7
 }
+
+// Validar email
+function isValidEmail(email) {
+    let regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+}
+
+// Escape HTML
+function escapeHtml(text) {
+    if (!text) return '';
+    return text.replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+}

@@ -24,25 +24,112 @@ CREATE TABLE IF NOT EXISTS `clientes` (
   `asaas_id` VARCHAR(255) DEFAULT NULL,
   `nomeCliente` VARCHAR(255) NOT NULL,
   `sexo` VARCHAR(20) NULL,
+  `nascimento` DATE NULL DEFAULT NULL,
+  `tratamento` VARCHAR(50) NULL DEFAULT 'Sr.(a)',
   `pessoa_fisica` BOOLEAN NOT NULL DEFAULT 1,
   `documento` VARCHAR(20) NOT NULL,
-  `telefone` VARCHAR(20) NOT NULL,
-  `celular` VARCHAR(20) NULL DEFAULT NULL,
-  `email` VARCHAR(100) NOT NULL,
+  `ie` VARCHAR(20) NULL DEFAULT NULL,
+  `im` VARCHAR(20) NULL DEFAULT NULL,
+  `telefone` VARCHAR(25) NOT NULL,
+  `celular` VARCHAR(25) NULL DEFAULT NULL,
+  `email` VARCHAR(255) NOT NULL,
   `senha` VARCHAR(200) NOT NULL,
   `dataCadastro` DATE NULL DEFAULT NULL,
-  `rua` VARCHAR(70) NULL DEFAULT NULL,
-  `numero` VARCHAR(15) NULL DEFAULT NULL,
-  `bairro` VARCHAR(45) NULL DEFAULT NULL,
-  `cidade` VARCHAR(45) NULL DEFAULT NULL,
+  `data_enriquecimento` DATETIME NULL DEFAULT NULL,
+  `prospectado` TINYINT(1) NOT NULL DEFAULT 0,
+  `origem_prospeccao` VARCHAR(50) NULL DEFAULT NULL,
+  `rua` VARCHAR(255) NULL DEFAULT NULL,
+  `numero` VARCHAR(10) NULL DEFAULT NULL,
+  `bairro` VARCHAR(100) NULL DEFAULT NULL,
+  `cidade` VARCHAR(100) NULL DEFAULT NULL,
   `estado` VARCHAR(20) NULL DEFAULT NULL,
-  `cep` VARCHAR(20) NULL DEFAULT NULL,
-  `contato` varchar(45) DEFAULT NULL,
-  `complemento` varchar(45) DEFAULT NULL,
+  `cep` VARCHAR(10) NULL DEFAULT NULL,
+  `codigo_ibge` VARCHAR(10) NULL DEFAULT NULL,
+  `contato` VARCHAR(100) DEFAULT NULL,
+  `complemento` VARCHAR(100) DEFAULT NULL,
+  `tipo` VARCHAR(32) NULL DEFAULT NULL,
+  `porte` VARCHAR(50) NULL DEFAULT NULL,
+  `cnae` VARCHAR(7) NULL DEFAULT NULL,
+  `fantasia` VARCHAR(255) NULL DEFAULT NULL,
+  `atividade_principal` VARCHAR(255) NULL DEFAULT NULL,
+  `atividades_secundarias` TEXT NULL,
+  `natureza_juridica` VARCHAR(255) NULL DEFAULT NULL,
+  `situacao` VARCHAR(50) NULL DEFAULT NULL,
+  `data_situacao` DATE NULL DEFAULT NULL,
+  `motivo_situacao` VARCHAR(255) NULL DEFAULT NULL,
+  `situacao_especial` VARCHAR(100) NULL DEFAULT NULL,
+  `data_situacao_especial` DATE NULL DEFAULT NULL,
+  `capital_social` VARCHAR(50) NULL DEFAULT NULL,
+  `qsa` TEXT NULL,
+  `latitude` DECIMAL(10,8) NULL DEFAULT NULL,
+  `longitude` DECIMAL(11,8) NULL DEFAULT NULL,
+  `endereco_geocodificado` TEXT NULL,
   `fornecedor` BOOLEAN NOT NULL DEFAULT 0,
   PRIMARY KEY (`idClientes`))
 ENGINE = InnoDB
 AUTO_INCREMENT = 1
+DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+
+-- -----------------------------------------------------
+-- Table `usuarios_clientes`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `usuarios_clientes` (
+  `idUsuariosClientes` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `nome` VARCHAR(255) NOT NULL,
+  `email` VARCHAR(100) NOT NULL,
+  `senha` VARCHAR(200) NOT NULL,
+  `situacao` TINYINT(1) NOT NULL DEFAULT 1,
+  `dataCadastro` DATETIME NOT NULL,
+  PRIMARY KEY (`idUsuariosClientes`),
+  KEY `idx_usuarios_clientes_email` (`email`)
+) ENGINE = InnoDB
+DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+
+-- -----------------------------------------------------
+-- Table `vinculos_usuarios_clientes`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `vinculos_usuarios_clientes` (
+  `idVinculo` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `usuarios_clientes_id` INT(11) UNSIGNED NOT NULL,
+  `clientes_id` INT(11) NOT NULL,
+  `tipo` VARCHAR(20) NOT NULL DEFAULT 'admin',
+  PRIMARY KEY (`idVinculo`),
+  KEY `idx_vinculos_usuarios_clientes_usuario` (`usuarios_clientes_id`),
+  KEY `idx_vinculos_usuarios_clientes_cliente` (`clientes_id`),
+  CONSTRAINT `fk_vinculo_usuario_cliente`
+    FOREIGN KEY (`usuarios_clientes_id`)
+    REFERENCES `usuarios_clientes` (`idUsuariosClientes`)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_vinculo_cliente_usuario`
+    FOREIGN KEY (`clientes_id`)
+    REFERENCES `clientes` (`idClientes`)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION
+) ENGINE = InnoDB
+DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+
+-- -----------------------------------------------------
+-- Table `contatos`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `contatos` (
+  `idContatos` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `cliente_id` INT(11) NOT NULL,
+  `nome` VARCHAR(255) NOT NULL,
+  `telefone` TEXT NULL,
+  `celular` TEXT NULL,
+  `email` TEXT NULL,
+  `cargo` VARCHAR(100) NULL,
+  `observacoes` TEXT NULL,
+  `dataCadastro` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`idContatos`),
+  KEY `idx_contatos_cliente` (`cliente_id`),
+  CONSTRAINT `fk_contatos`
+    FOREIGN KEY (`cliente_id`)
+    REFERENCES `clientes` (`idClientes`)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION
+) ENGINE = InnoDB
 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 
 CREATE TABLE IF NOT EXISTS `resets_de_senha` ( 

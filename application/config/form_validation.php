@@ -7,55 +7,138 @@ $config = [
         [
             'field' => 'nomeCliente',
             'label' => 'Nome',
-            'rules' => 'required|trim',
+            'rules' => 'required|trim|max_length[255]',
         ],
         [
             'field' => 'documento',
             'label' => 'CPF/CNPJ',
-            'rules' => 'trim|verific_cpf_cnpj|unique[clientes.documento.' . get_instance()->uri->segment(3) . '.idClientes]',
+            'rules' => 'trim|max_length[20]|verific_cpf_cnpj|unique[clientes.documento.' . get_instance()->uri->segment(3) . '.idClientes]',
             'errors' => [
                 'verific_cpf_cnpj' => 'O campo %s não é um CPF ou CNPJ válido.',
             ],
         ],
         [
+            'field' => 'ie',
+            'label' => 'Inscrição Estadual',
+            'rules' => 'trim|max_length[20]|valid_ie',
+            'errors' => [
+                'valid_ie' => 'O campo Inscrição Estadual está inválido.',
+            ],
+        ],
+        [
+            'field' => 'im',
+            'label' => 'Inscrição Municipal',
+            'rules' => 'trim|min_length[5]|max_length[20]|valid_im',
+            'errors' => [
+                'valid_im' => 'O campo Inscrição Municipal está inválido.',
+            ],
+        ],
+        [
             'field' => 'telefone',
             'label' => 'Telefone',
-            'rules' => 'trim',
+            'rules' => 'trim|max_length[25]',
+        ],
+        [
+            'field' => 'celular',
+            'label' => 'Celular',
+            'rules' => 'trim|max_length[25]',
         ],
         [
             'field' => 'email',
             'label' => 'Email',
-            'rules' => 'trim|valid_email|unique[clientes.email.' . get_instance()->uri->segment(3) . '.idClientes]',
+            'rules' => 'trim|valid_email|max_length[255]',
         ],
         [
             'field' => 'rua',
             'label' => 'Rua',
-            'rules' => 'trim',
+            'rules' => 'trim|max_length[255]',
         ],
         [
             'field' => 'numero',
             'label' => 'Número',
-            'rules' => 'trim',
+            'rules' => 'trim|max_length[10]',
+        ],
+        [
+            'field' => 'complemento',
+            'label' => 'Complemento',
+            'rules' => 'trim|max_length[100]',
         ],
         [
             'field' => 'bairro',
             'label' => 'Bairro',
-            'rules' => 'trim',
+            'rules' => 'trim|max_length[100]',
         ],
         [
             'field' => 'cidade',
             'label' => 'Cidade',
-            'rules' => 'trim',
+            'rules' => 'trim|max_length[100]',
         ],
         [
             'field' => 'estado',
             'label' => 'Estado',
-            'rules' => 'trim',
+            'rules' => 'trim|max_length[20]',
         ],
         [
             'field' => 'cep',
             'label' => 'CEP',
-            'rules' => 'trim',
+            'rules' => 'trim|max_length[10]',
+        ],
+        [
+            'field' => 'codigo_ibge',
+            'label' => 'Código IBGE',
+            'rules' => 'trim|max_length[10]',
+        ],
+        [
+            'field' => 'contato',
+            'label' => 'Pessoa de Contato',
+            'rules' => 'trim|max_length[100]',
+        ],
+        [
+            'field' => 'sexo',
+            'label' => 'Sexo',
+            'rules' => 'trim|max_length[50]',
+        ],
+        [
+            'field' => 'nascimento',
+            'label' => 'Data de Nascimento',
+            'rules' => 'trim|max_length[10]',
+        ],
+        [
+            'field' => 'tratamento',
+            'label' => 'Forma de Tratamento',
+            'rules' => 'trim|max_length[50]',
+        ],
+    ],
+    'contatos' => [
+        [
+            'field' => 'nome',
+            'label' => 'Nome',
+            'rules' => 'required|trim|max_length[255]',
+        ],
+        [
+            'field' => 'telefone',
+            'label' => 'Telefone',
+            'rules' => 'callback_validar_multiplos_telefones',
+        ],
+        [
+            'field' => 'celular',
+            'label' => 'Celular',
+            'rules' => 'callback_validar_multiplos_telefones',
+        ],
+        [
+            'field' => 'email',
+            'label' => 'Email',
+            'rules' => 'callback_validar_multiplos_emails',
+        ],
+        [
+            'field' => 'cargo',
+            'label' => 'Cargo',
+            'rules' => 'trim|max_length[100]',
+        ],
+        [
+            'field' => 'observacoes',
+            'label' => 'Observações',
+            'rules' => 'trim|max_length[500]',
         ],
     ],
     'servicos' => [
@@ -186,7 +269,7 @@ $config = [
         [
             'field' => 'dataFinal',
             'label' => 'DataFinal',
-            'rules' => 'trim|required',
+            'rules' => 'trim',
         ],
         [
             'field' => 'garantia',

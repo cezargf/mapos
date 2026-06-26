@@ -59,7 +59,11 @@ class Login extends CI_Controller
                     echo json_encode($json);
                 }
             } else {
-                $json = ['result' => false, 'message' => 'Usuário não encontrado, verifique se suas credenciais estão corretass.', 'MAPOS_TOKEN' => $this->security->get_csrf_hash()];
+                // Simulate password_verify to mitigate timing attacks and username enumeration
+                $dummy_hash = '$2y$10$dummyhashdummyhashdummyhashdummyhashdummyhashdummyhas';
+                password_verify($password, $dummy_hash);
+
+                $json = ['result' => false, 'message' => 'Os dados de acesso estão incorretos.', 'MAPOS_TOKEN' => $this->security->get_csrf_hash()];
                 echo json_encode($json);
             }
         }

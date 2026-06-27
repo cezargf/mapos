@@ -221,18 +221,20 @@ function dataOuTraco($valor)
                                         <?php echo $result->documento ?>
                                     </td>
                                 </tr>
-                                <tr>
-                                    <td style="text-align: right"><strong>Inscrição Estadual (IE)</strong></td>
-                                    <td>
-                                        <?php echo !empty($result->ie) ? $result->ie : '---' ?>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td style="text-align: right"><strong>Inscrição Municipal (IM)</strong></td>
-                                    <td>
-                                        <?php echo !empty($result->im) ? $result->im : '---' ?>
-                                    </td>
-                                </tr>
+                                <?php if (!$isPessoaFisica) { ?>
+                                    <tr>
+                                        <td style="text-align: right"><strong>Inscrição Estadual (IE)</strong></td>
+                                        <td>
+                                            <?php echo !empty($result->ie) ? $result->ie : '---' ?>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="text-align: right"><strong>Inscrição Municipal (IM)</strong></td>
+                                        <td>
+                                            <?php echo !empty($result->im) ? $result->im : '---' ?>
+                                        </td>
+                                    </tr>
+                                <?php } ?>
                                 <tr>
                                     <td style="text-align: right"><strong>Data de Cadastro</strong></td>
                                     <td>

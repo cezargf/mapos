@@ -17,7 +17,7 @@ class Contatos_model extends CI_Model
     {
         $this->db->where('cliente_id', $cliente_id);
         $this->db->order_by('nome', 'asc');
-        $query = $this->db->get('contatos_clientes');
+        $query = $this->db->get('contatos');
 
         $result = ! $query ? [] : $query->result();
 
@@ -33,7 +33,7 @@ class Contatos_model extends CI_Model
     public function getById($id)
     {
         $this->db->where('idContatos', $id);
-        return $this->db->get('contatos_clientes')->row();
+        return $this->db->get('contatos')->row();
     }
 
     /**
@@ -44,7 +44,7 @@ class Contatos_model extends CI_Model
      */
     public function add($data)
     {
-        $this->db->insert('contatos_clientes', $data);
+        $this->db->insert('contatos', $data);
         if ($this->db->affected_rows() == 1) {
             return $this->db->insert_id();
         }
@@ -61,7 +61,7 @@ class Contatos_model extends CI_Model
     public function edit($id, $data)
     {
         $this->db->where('idContatos', $id);
-        $this->db->update('contatos_clientes', $data);
+        $this->db->update('contatos', $data);
         return $this->db->affected_rows() >= 0;
     }
 
@@ -74,7 +74,7 @@ class Contatos_model extends CI_Model
     public function delete($id)
     {
         $this->db->where('idContatos', $id);
-        $this->db->delete('contatos_clientes');
+        $this->db->delete('contatos');
         return $this->db->affected_rows() == 1;
     }
 
@@ -87,7 +87,7 @@ class Contatos_model extends CI_Model
     public function countByCliente($cliente_id)
     {
         $this->db->where('cliente_id', $cliente_id);
-        return $this->db->count_all_results('contatos_clientes');
+        return $this->db->count_all_results('contatos');
     }
 
     /**
@@ -108,7 +108,7 @@ class Contatos_model extends CI_Model
         $this->db->where('email', $email);
         $this->db->or_like('email', '"' . $email . '"');
         $this->db->group_end();
-        $query = $this->db->get('contatos_clientes');
+        $query = $this->db->get('contatos');
         return $query->num_rows() > 0;
     }
 }

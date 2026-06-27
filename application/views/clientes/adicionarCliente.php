@@ -19,7 +19,6 @@
         transform: translateY(-50%);
         width: 18px;
         cursor: pointer;
-        z-index: 1051 !important;
     }
 
     .password-wrapper {

@@ -208,6 +208,7 @@ class Mapos extends MY_Controller
             redirect(site_url('mapos/emitente'));
         } else {
             $nome = $this->input->post('nome');
+            $nome_fantasia = $this->input->post('nome_fantasia');
             $cnpj = $this->input->post('cnpj');
             $ie = $this->input->post('ie');
             $im = $this->input->post('im');
@@ -250,7 +251,7 @@ class Mapos extends MY_Controller
             $image = $this->do_upload();
             $logo = base_url() . 'assets/uploads/' . $image;
 
-            $retorno = $this->mapos_model->addEmitente($nome, $cnpj, $ie, $im, $cep, $logradouro, $numero, $complemento, $bairro, $cidade, $uf, $telefone, $email, $logo, $cnae, $atividade_principal, $situacao, $data_situacao, $data_abertura, $natureza_juridica, $porte, $capital_social, $qsa, $email_contador, $codigo_ibge, $numero_nfe, $numero_nfce, $latitude, $longitude);
+            $retorno = $this->mapos_model->addEmitente($nome, $nome_fantasia, $cnpj, $ie, $im, $cep, $logradouro, $numero, $complemento, $bairro, $cidade, $uf, $telefone, $email, $logo, $cnae, $atividade_principal, $situacao, $data_situacao, $data_abertura, $natureza_juridica, $porte, $capital_social, $qsa, $email_contador, $codigo_ibge, $numero_nfe, $numero_nfce, $latitude, $longitude);
             if ($retorno) {
                 $this->session->set_flashdata('success', 'As informações foram inseridas com sucesso.');
                 log_info('Adicionou informações de emitente.');
@@ -274,6 +275,7 @@ class Mapos extends MY_Controller
             redirect(site_url('mapos/emitente'));
         } else {
             $nome = $this->input->post('nome');
+            $nome_fantasia = $this->input->post('nome_fantasia');
             $cnpj = $this->input->post('cnpj');
             $ie = $this->input->post('ie');
             $im = $this->input->post('im');
@@ -315,7 +317,7 @@ class Mapos extends MY_Controller
             $longitude = $this->input->post('longitude');
             $id = $this->input->post('id');
 
-            $retorno = $this->mapos_model->editEmitente($id, $nome, $cnpj, $ie, $im, $cep, $logradouro, $numero, $complemento, $bairro, $cidade, $uf, $telefone, $email, $cnae, $atividade_principal, $situacao, $data_situacao, $data_abertura, $natureza_juridica, $porte, $capital_social, $qsa, $email_contador, $codigo_ibge, $numero_nfe, $numero_nfce, $latitude, $longitude);
+            $retorno = $this->mapos_model->editEmitente($id, $nome, $nome_fantasia, $cnpj, $ie, $im, $cep, $logradouro, $numero, $complemento, $bairro, $cidade, $uf, $telefone, $email, $cnae, $atividade_principal, $situacao, $data_situacao, $data_abertura, $natureza_juridica, $porte, $capital_social, $qsa, $email_contador, $codigo_ibge, $numero_nfe, $numero_nfce, $latitude, $longitude);
             if ($retorno) {
                 $this->session->set_flashdata('success', 'As informações foram alteradas com sucesso.');
                 log_info('Alterou informações de emitente.');

@@ -201,6 +201,12 @@
                             <input id="nomeEmitente" placeholder="Nome completo da empresa ou pessoa jurídica" type="text" name="nome" value="" title="Razão Social: Nome completo da empresa ou pessoa jurídica. Campo obrigatório." />
                         </div>
                     </div>
+                    <div class="control-group">
+                        <label for="nomeFantasiaEmitente" class="control-label">Nome Fantasia</label>
+                        <div class="controls">
+                            <input id="nomeFantasiaEmitente" placeholder="Nome fantasia da empresa" type="text" name="nome_fantasia" value="" title="Nome Fantasia: Nome comercial da empresa. Opcional." />
+                        </div>
+                    </div>
                     <div class="control-group documento-group">
                         <label for="documento" class="control-label">CNPJ<span class="required">*</span></label>
                         <div class="controls">
@@ -417,6 +423,9 @@
                                 <td style="width: 25%"><img src="<?= $dados->url_logo; ?>"></td>
                                 <td>
                                     <span style="font-size: 20px; "><b><?= $dados->nome; ?></b></span></br>
+                                    <?php if (!empty($dados->nome_fantasia)) { ?>
+                                        <span><strong>Nome Fantasia:</strong> <?= $dados->nome_fantasia; ?></span></br>
+                                    <?php } ?>
                                     <i class="fas fa-fingerprint" style="margin:5px 1px"></i> <?= $dados->cnpj; ?> <?php if (!empty($dados->ie)) {
                                         echo ' - IE:' . $dados->ie;
                                     } ?><?php if (!empty($dados->im)) {
@@ -455,6 +464,12 @@
                         <div class="controls">
                             <input id="edit_nomeEmitente" type="text" name="nome" value="<?= $dados->nome; ?>" placeholder="Nome completo da empresa ou pessoa jurídica" title="Razão Social: Nome completo da empresa ou pessoa jurídica. Campo obrigatório." />
                             <input id="edit_id" type="hidden" name="id" value="<?= $dados->id; ?>" />
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label for="edit_nomeFantasiaEmitente" class="control-label">Nome Fantasia</label>
+                        <div class="controls">
+                            <input id="edit_nomeFantasiaEmitente" type="text" name="nome_fantasia" value="<?= $dados->nome_fantasia ?? ''; ?>" placeholder="Nome fantasia da empresa" title="Nome Fantasia: Nome comercial da empresa. Opcional." />
                         </div>
                     </div>
                     <div class="control-group documento-group">

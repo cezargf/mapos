@@ -382,9 +382,10 @@ class Mapos_model extends CI_Model
         return $this->db->get('emitente')->row();
     }
 
-    public function addEmitente($nome, $cnpj, $ie, $im, $cep, $logradouro, $numero, $complemento, $bairro, $cidade, $uf, $telefone, $email, $logo, $cnae = null, $atividade_principal = null, $situacao = null, $data_situacao = null, $data_abertura = null, $natureza_juridica = null, $porte = null, $capital_social = null, $qsa = null, $email_contador = null, $codigo_ibge = null, $numero_nfe = 0, $numero_nfce = 0, $latitude = null, $longitude = null)
+    public function addEmitente($nome, $nome_fantasia, $cnpj, $ie, $im, $cep, $logradouro, $numero, $complemento, $bairro, $cidade, $uf, $telefone, $email, $logo, $cnae = null, $atividade_principal = null, $situacao = null, $data_situacao = null, $data_abertura = null, $natureza_juridica = null, $porte = null, $capital_social = null, $qsa = null, $email_contador = null, $codigo_ibge = null, $numero_nfe = 0, $numero_nfce = 0, $latitude = null, $longitude = null)
     {
         $this->db->set('nome', $nome);
+        $this->db->set('nome_fantasia', $nome_fantasia);
         $this->db->set('cnpj', $cnpj);
         $this->db->set('ie', $ie);
         $this->db->set('im', $im);
@@ -417,9 +418,10 @@ class Mapos_model extends CI_Model
         return $this->db->insert('emitente');
     }
 
-    public function editEmitente($id, $nome, $cnpj, $ie, $im, $cep, $logradouro, $numero, $complemento, $bairro, $cidade, $uf, $telefone, $email, $cnae = null, $atividade_principal = null, $situacao = null, $data_situacao = null, $data_abertura = null, $natureza_juridica = null, $porte = null, $capital_social = null, $qsa = null, $email_contador = null, $codigo_ibge = null, $numero_nfe = 0, $numero_nfce = 0, $latitude = null, $longitude = null)
+    public function editEmitente($id, $nome, $nome_fantasia, $cnpj, $ie, $im, $cep, $logradouro, $numero, $complemento, $bairro, $cidade, $uf, $telefone, $email, $cnae = null, $atividade_principal = null, $situacao = null, $data_situacao = null, $data_abertura = null, $natureza_juridica = null, $porte = null, $capital_social = null, $qsa = null, $email_contador = null, $codigo_ibge = null, $numero_nfe = 0, $numero_nfce = 0, $latitude = null, $longitude = null)
     {
         $this->db->set('nome', $nome);
+        $this->db->set('nome_fantasia', $nome_fantasia);
         $this->db->set('cnpj', $cnpj);
         $this->db->set('ie', $ie);
         $this->db->set('im', $im);

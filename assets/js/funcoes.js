@@ -226,7 +226,7 @@ $(document).ready(function () {
         
         // Seta "..." nos campos para indicar carregamento
         const fieldsToReset = [
-            'input[name="nome"]', 'input[name="nomeCliente"]', 'input[name="cep"]', 
+            'input[name="nome"]', 'input[name="nome_fantasia"]', 'input[name="nomeCliente"]', 'input[name="cep"]', 
             'input[name="logradouro"]', 'input[name="rua"]', 'input[name="numero"]', 
             'input[name="bairro"]', 'input[name="email"]', 'input[name="telefone"]'
         ].join(', ');
@@ -251,7 +251,7 @@ $(document).ready(function () {
                 // --- Preenchimento de campos ---
                 // Nomes (Razão Social e Fantasia)
                 container.find('[name="nome"], [name="nomeCliente"]').val(capital_letter(data.nome));
-                container.find('[name="fantasia"]').val(capital_letter(data.fantasia));
+                container.find('[name="nome_fantasia"], [name="fantasia"]').val(capital_letter(data.fantasia));
                 
                 // Endereço
                 container.find('[name="logradouro"], [name="rua"]').val(capital_letter(data.logradouro));

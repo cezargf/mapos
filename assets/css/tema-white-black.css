@@ -2,6 +2,12 @@
 /*  Thomas Lage - lage.thomas@gmail.com  */
 /*=======================================*/
 /* ===========================> FOCUS <=========================== */
+input[type="date"],
+input[type="email"],
+input[type="password"],
+textarea,
+span[class*="select2"],
+select[disabled],
 input[type="search"],
 select,
 input[type="text"],
@@ -482,6 +488,34 @@ label {
 
 .pass-user {
     color: var(--white-blak-tit);
+}
+
+/* ACCORDION */
+.accordion-group {
+    background   : var(--white-blak-cont);
+    border       : 1px solid var(--cinza0);
+    border-radius: 4px;
+}
+
+.accordion-heading {
+    background   : var(--white-blak-cont);
+    border       : none;
+    border-radius: 4px;
+    padding      : 10px;
+}
+
+.accordion-heading a,
+.accordion-heading a i,
+.accordion-heading a strong {
+    background: var(--white-blak-cont);
+    color     : var(--white-blak-tit);
+}
+
+.accordion-heading a:hover,
+.accordion-heading a i:hover,
+.accordion-heading a strong:hover {
+    background: var(--white-blak-cont);
+    color     : var(--white-blak-tit);
 }
 
 @media (max-width: 480px) {

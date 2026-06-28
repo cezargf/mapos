@@ -184,6 +184,7 @@ input[type="email"],
 input[type="password"],
 textarea,
 span[class*="select2"],
+select[disabled],
 input[type="search"],
 select,
 input[type="text"],
@@ -244,6 +245,34 @@ h3 {
 .button__icon {
   font-size : 1.5em;
   background: rgba(0, 0, 0, 0.08);
+}
+
+/* ACCORDION */
+.accordion-group {
+  background   : #f2f5fa;
+  border       : 1px solid #c8e2d5;
+  border-radius: 4px;
+}
+
+.accordion-heading {
+  background   : #f2f5fa;
+  border       : none;
+  border-radius: 4px;
+  padding      : 10px;
+}
+
+.accordion-heading a,
+.accordion-heading a i,
+.accordion-heading a strong {
+  background: #f2f5fa;
+  color     : #5f5f73;
+}
+
+.accordion-heading a:hover,
+.accordion-heading a i:hover,
+.accordion-heading a strong:hover {
+  background: #f2f5fa;
+  color     : #5f5f73;
 }
 
 .accordion-heading h5 {

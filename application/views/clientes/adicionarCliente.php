@@ -30,10 +30,6 @@
         opacity: 0;
     }
 
-    #accordion-cliente {
-        border: none !important;
-    }
-
     .badgebox+.badge {
         text-indent: -999999px;
         width: 27px;
@@ -65,6 +61,11 @@
         padding-top: 15px;
     }
 
+    .required {
+        color: red;
+        margin-left: 5px;
+    }
+
     .nopadding {
         padding: 0 20px !important;
         /* margin-right: 20px; */
@@ -80,32 +81,21 @@
 
     .accordion-group {
         margin-bottom: 15px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-    }
-
-    #accordion-cliente {
         border: none !important;
     }
 
     .accordion-heading a {
         padding: 12px 15px;
         display: block;
-        background-color: #f5f5f5;
         border-radius: 4px;
         cursor: pointer;
         font-weight: 600;
-        color: #333;
         text-decoration: none;
-    }
-
-    .accordion-heading a:hover {
-        background-color: #e8e8e8;
     }
 
     .accordion-body {
         display: none;
-        padding: 10px;
+        padding: 20px;
     }
 
     .accordion-body.in {
@@ -716,17 +706,22 @@
             let documento = $('#documento').val().replace(/\D/g, ''); // Remove não-dígitos
             let campos_pessoa_fisica = $('.campos-pessoa-fisica');
             let campos_pessoa_juridica = $('.campos-pessoa-juridica');
+            let labelNome = $('#nomeCliente').closest('.control-group').find('label[for="nomeCliente"]');
+            let labelObrigatoria = '<span class="required">*</span>';
             
             if (documento.length === 11) {
                 // É CPF - mostrar campos de pessoa física e ocultar de pessoa jurídica
+                labelNome.html('Nome Completo' + labelObrigatoria);
                 campos_pessoa_fisica.addClass('visible');
                 campos_pessoa_juridica.addClass('hidden');
             } else if (documento.length === 14) {
                 // É CNPJ - ocultar campos de pessoa física e mostrar de pessoa jurídica
+                labelNome.html('Razão Social' + labelObrigatoria);
                 campos_pessoa_fisica.removeClass('visible');
                 campos_pessoa_juridica.removeClass('hidden');
             } else if (documento.length === 0) {
                 // Vazio - ocultar campos de pessoa física, mostrar de pessoa jurídica
+                labelNome.html('Nome/Razão Social' + labelObrigatoria);
                 campos_pessoa_fisica.removeClass('visible');
                 campos_pessoa_juridica.removeClass('hidden');
             }

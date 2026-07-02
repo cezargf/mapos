@@ -347,7 +347,11 @@ DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 CREATE TABLE IF NOT EXISTS `produtos` (
   `idProdutos` INT(11) NOT NULL AUTO_INCREMENT,
   `codDeBarra` VARCHAR(70) NOT NULL,
-  `descricao` VARCHAR(80) NOT NULL,
+  `codDeFabrica` VARCHAR(255) NULL DEFAULT NULL,
+  `nome` VARCHAR(255) NOT NULL,
+  `descricao` VARCHAR(255) NOT NULL,
+  `modelo` VARCHAR(100) NULL DEFAULT NULL,
+  `fabricante` VARCHAR(100) NULL DEFAULT NULL,
   `unidade` VARCHAR(10) NULL DEFAULT NULL,
   `precoCompra` DECIMAL(10,2) NULL DEFAULT NULL,
   `precoVenda` DECIMAL(10,2) NOT NULL,
@@ -355,7 +359,38 @@ CREATE TABLE IF NOT EXISTS `produtos` (
   `estoqueMinimo` INT(11) NULL DEFAULT NULL,
   `saida`	TINYINT(1) NULL DEFAULT NULL,
   `entrada`	TINYINT(1) NULL DEFAULT NULL,
+  `url_pagina` VARCHAR(255) NULL DEFAULT NULL,
+  `url_especificacoes` VARCHAR(255) NULL DEFAULT NULL,
+  `url_manual` VARCHAR(255) NULL DEFAULT NULL,
+  `ncm` VARCHAR(20) NULL DEFAULT NULL,
+  `cest` VARCHAR(20) NULL DEFAULT NULL,
+  `origem` VARCHAR(1) NULL DEFAULT NULL,
+  `cst_csosn` VARCHAR(10) NULL DEFAULT NULL,
+  `ibs_cbs` VARCHAR(50) NULL DEFAULT NULL,
+  `aliquota_icms` DECIMAL(10,2) NULL DEFAULT 0.00,
   PRIMARY KEY (`idProdutos`))
+ENGINE = InnoDB
+AUTO_INCREMENT = 1
+DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+
+
+-- -----------------------------------------------------
+-- Table `produtos_imagens`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `produtos_imagens` (
+  `idImagens` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `url` VARCHAR(255) NOT NULL,
+  `thumb` VARCHAR(255) NOT NULL,
+  `path` VARCHAR(255) NOT NULL,
+  `principal` TINYINT(1) NOT NULL DEFAULT 0,
+  `produtos_id` INT(11) UNSIGNED NOT NULL,
+  PRIMARY KEY (`idImagens`),
+  INDEX `fk_produtos_imagens_produtos1_idx` (`produtos_id` ASC),
+  CONSTRAINT `fk_produtos_imagens_produtos1`
+    FOREIGN KEY (`produtos_id`)
+    REFERENCES `produtos` (`idProdutos`)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION)
 ENGINE = InnoDB
 AUTO_INCREMENT = 1
 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;

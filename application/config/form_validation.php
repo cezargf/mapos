@@ -160,9 +160,29 @@ $config = [
     ],
     'produtos' => [
         [
+            'field' => 'codDeFabrica',
+            'label' => 'Código de Fabrica',
+            'rules' => 'trim|max_length[255]',
+        ],
+        [
+            'field' => 'nome',
+            'label' => 'Nome',
+            'rules' => 'required|trim|max_length[255]',
+        ],
+        [
             'field' => 'descricao',
-            'label' => '',
-            'rules' => 'required|trim',
+            'label' => 'Descrição',
+            'rules' => 'trim|max_length[255]',
+        ],
+        [
+            'field' => 'modelo',
+            'label' => 'Modelo',
+            'rules' => 'trim|max_length[100]',
+        ],
+        [
+            'field' => 'fabricante',
+            'label' => 'Fabricante',
+            'rules' => 'trim|max_length[100]',
         ],
         [
             'field' => 'unidade',
@@ -188,6 +208,63 @@ $config = [
             'field' => 'estoqueMinimo',
             'label' => 'Estoque Minimo',
             'rules' => 'trim',
+        ],
+        [
+            'field' => 'url_pagina',
+            'label' => 'Página do Produto (URL)',
+            'rules' => 'trim|valid_url',
+        ],
+        [
+            'field' => 'url_especificacoes',
+            'label' => 'Especificações (URL)',
+            'rules' => 'trim|valid_url',
+        ],
+        [
+            'field' => 'url_manual',
+            'label' => 'Manual (URL)',
+            'rules' => 'trim|valid_url',
+        ],
+        [
+            'field' => 'ncm',
+            'label' => 'NCM',
+            'rules' => 'trim|max_length[8]',
+        ],
+        [
+            'field' => 'cest',
+            'label' => 'CEST',
+            'rules' => 'trim',
+        ],
+        [
+            'field' => 'origem',
+            'label' => 'Origem',
+            'rules' => 'trim',
+        ],
+        [
+            'field' => 'cst_csosn',
+            'label' => 'CST/CSOSN',
+            'rules' => 'required|trim|max_length[3]',
+        ],
+        [
+            'field' => 'ibs_cbs',
+            'label' => 'IBS/CBS',
+            'rules' => 'trim',
+        ],
+    ],
+    'adicionar_produtos_imagens' => [
+        [
+            'field' => 'url',
+            'label' => 'URL',
+            'rules' => 'required|trim|max_length[255]',
+        ],
+        [
+            'field' => 'thumb',
+            'label' => 'Thumb',
+            'rules' => 'required|trim|max_length[255]',
+        ],
+        [
+            'field' => 'path',
+            'label' => 'Path',
+            'rules' => 'required|trim|max_length[255]',
         ],
     ],
     'usuarios' => [

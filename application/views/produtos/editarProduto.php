@@ -862,15 +862,15 @@
         });
 
         $('#buscar_info_gtin').on('click', function() {
-            var gtin = $('#codDeBarra').val();
+            var gtin = $('#codDeFabrica').val();
             if (gtin.length < 8) {
-                swal("Atenção", "Digite um GTIN válido (8 a 14 dígitos) no Código de Barras.", "warning");
+                swal("Atenção", "Digite um GTIN válido (8 a 14 dígitos) no Código de Fábrica.", "warning");
                 return;
             }
 
             var btn = $(this);
             var originalHtml = btn.html();
-            btn.html('<i class="fas fa-spinner fa-spin"></i>').prop('disabled', true);
+            btn.html('<span class="button__icon"><i class="bx bx-loader bx-spin"></i></span><span class="button__text2">Consultar</span>').prop('disabled', true);
 
             $.ajax({
                 url: "<?php echo site_url('produtos/consultarCosmos'); ?>",

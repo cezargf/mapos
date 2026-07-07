@@ -125,6 +125,28 @@
         image-orientation: from-image;
     }
 
+    #modal-visualizar-imagem {
+        width: auto;
+        max-width: none;
+    }
+
+    #modal-visualizar-imagem .modal-body {
+        padding: 10px;
+        text-align: center;
+        max-height: calc(100vh - 140px);
+        overflow: hidden;
+    }
+
+    #modal-visualizar-imagem #imagem-modal {
+        display: block;
+        margin: 0 auto;
+        width: auto;
+        height: auto;
+        max-width: 100%;
+        max-height: calc(100vh - 160px);
+        object-fit: contain;
+    }
+
     @media (max-width: 767px) {
         .accordion .widget-content {
             display: block;
@@ -142,6 +164,21 @@
         .images-section .thumbnails > li {
             width: calc(50% - 12px);
             margin-right: 12px;
+        }
+
+        #modal-visualizar-imagem {
+            left: 2%;
+            right: 2%;
+            width: auto;
+            margin-left: 0;
+        }
+
+        #modal-visualizar-imagem .modal-body {
+            max-height: calc(100vh - 120px);
+        }
+
+        #modal-visualizar-imagem #imagem-modal {
+            max-height: calc(100vh - 140px);
         }
     }
 
@@ -316,9 +353,9 @@ if (isset($result->nome)) {
                         <ul class="thumbnails">
                             <?php foreach ($images as $img) : ?>
                                 <li class="span2">
-                                    <a href="<?php echo $img->url; ?>" target="_blank" class="thumbnail">
+                                    <a href="#" class="thumbnail" data-toggle="modal" data-target="#modal-visualizar-imagem" data-image-url="<?php echo $img->url; ?>">
                                         <div class="image-landscape-frame">
-                                            <img src="<?php echo $img->thumb; ?>" alt="">
+                                            <img src="<?php echo $img->thumb; ?>" alt="Imagem do Produto">
                                         </div>
                                     </a>
                                 </li>
@@ -348,6 +385,16 @@ if (isset($result->nome)) {
     </div>
 </div>
 
+<div id="modal-visualizar-imagem" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="modal-visualizar-imagem-label" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h5 id="modal-visualizar-imagem-label"><i class="fas fa-image"></i> Visualizar Imagem</h5>
+    </div>
+    <div class="modal-body">
+        <img id="imagem-modal" src="" alt="">
+    </div>
+</div>
+
 <div id="modal-excluir-produto" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="modal-excluir-produto-label" aria-hidden="true">
     <form action="<?php echo base_url() ?>index.php/produtos/excluir" method="post">
         <div class="modal-header">
@@ -368,3 +415,87 @@ if (isset($result->nome)) {
         </div>
     </form>
 </div>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        var $janela = $(window);
+        var $modalVisualizarImagem = $('#modal-visualizar-imagem');
+        var $imagemModal = $modalVisualizarImagem.find('#imagem-modal');
+        var imagemSelecionadaUrl = '';
+
+        function ajustarLarguraModal() {
+            if (!$modalVisualizarImagem.hasClass('in')) {
+                return;
+            }
+
+            var larguraViewport = $janela.width();
+
+            if (larguraViewport <= 767) {
+                $modalVisualizarImagem.css({
+                    left: '2%',
+                    right: '2%',
+                    width: 'auto',
+                    'margin-left': '0'
+                });
+                return;
+            }
+
+            var imagem = $imagemModal.get(0);
+            var larguraNatural = imagem && imagem.naturalWidth ? imagem.naturalWidth : 0;
+            var larguraMaxima = Math.max(320, larguraViewport - 40);
+            var larguraDesejada = larguraNatural ? (larguraNatural + 40) : larguraMaxima;
+            var larguraFinal = Math.min(larguraMaxima, Math.max(320, larguraDesejada));
+
+            $modalVisualizarImagem.css({
+                right: 'auto',
+                left: '50%',
+                width: larguraFinal + 'px',
+                'margin-left': (larguraFinal / -2) + 'px'
+            });
+        }
+
+        $(document).on('click', 'a.thumbnail[data-target="#modal-visualizar-imagem"]', function() {
+            imagemSelecionadaUrl = $(this).attr('data-image-url') || '';
+
+            $imagemModal.attr({
+                src: imagemSelecionadaUrl,
+                alt: imagemSelecionadaUrl ? 'Imagem do Produto' : ''
+            });
+
+            if ($imagemModal.get(0) && $imagemModal.get(0).complete) {
+                ajustarLarguraModal();
+            }
+        });
+
+        $modalVisualizarImagem.on('show', function(event) {
+            var trigger = $(event.relatedTarget || null);
+            var imageUrl = trigger.length ? (trigger.attr('data-image-url') || imagemSelecionadaUrl) : imagemSelecionadaUrl;
+
+            $imagemModal.attr({
+                src: imageUrl,
+                alt: imageUrl ? 'Imagem do Produto' : ''
+            });
+
+            if ($imagemModal.get(0) && $imagemModal.get(0).complete) {
+                ajustarLarguraModal();
+            }
+        });
+
+        $imagemModal.on('load', function() {
+            ajustarLarguraModal();
+        });
+
+        $modalVisualizarImagem.on('hidden', function() {
+            imagemSelecionadaUrl = '';
+            $modalVisualizarImagem.removeAttr('style');
+            $imagemModal.attr({
+                src: '',
+                alt: ''
+            });
+        });
+
+        $janela.on('resize.modalVisualizarImagem', function() {
+            ajustarLarguraModal();
+        });
+    });
+</script>

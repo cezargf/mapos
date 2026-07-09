@@ -163,7 +163,8 @@ foreach ($results as $r) {
     echo '<td><span class="badge" style="background-color: ' . $cor . '; border-color: ' . $cor . '">' . $r->status . '</span> </td>';
     echo '<td>';
 
-    $editavel = $this->os_model->isEditable($r->idOs);
+    $osT = (int) ($r->status === 'Faturado' || $r->status === 'Cancelado' || $r->faturado == 1);
+    $editavel = $osT ? $configuration['control_editos'] == '1' : true;
 
     if ($this->permission->checkPermission($this->session->userdata('permissao'), 'vOs')) {
         echo '<a style="margin-right: 1%" href="' . base_url() . 'index.php/os/visualizar/' . $r->idOs . '" class="btn-nwe" title="Ver mais detalhes"><i class="bx bx-show"></i></a>';

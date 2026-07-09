@@ -139,7 +139,7 @@
                 echo '<a style="margin-right: 1%" href="' . base_url() . 'index.php/vendas/imprimirTermica/' . $r->idVendas . '" target="_blank" class="btn-nwe6" title="Imprimir Não Fiscal"><i class="bx bx-printer bx-xs"></i></a>';
             }
 
-            $editavel = $this->vendas_model->isEditable($r->idVendas);
+            $editavel = $r->faturado ? $configuration['control_edit_vendas'] == '1' : true;
 
             if ($r->faturado != 1 || $editavel) {
                 if ($this->permission->checkPermission($this->session->userdata('permissao'), 'eVenda')) {

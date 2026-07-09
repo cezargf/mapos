@@ -33,8 +33,19 @@ class Clientes extends MY_Controller
         $estado = $this->input->get('estado'); // Pode ser um array
         $tipo = $this->input->get('tipo');
         $pessoa_fisica = $this->input->get('pessoa_fisica');
-        $sort = $this->input->get('sort') ?: 'idClientes';
-        $order = $this->input->get('order') ?: 'desc';
+        $sortOptions = [
+            'idClientes' => 'Cod.',
+            'nomeCliente' => 'Nome',
+            'contato' => 'Contato',
+            'documento' => 'CPF/CNPJ',
+            'email' => 'Email',
+        ];
+        $defaultSort = 'idClientes';
+        $allowedSortColumns = array_keys($sortOptions);
+        $sort = $this->input->get('sort') ?: $defaultSort;
+        $sort = in_array($sort, $allowedSortColumns, true) ? $sort : $defaultSort;
+        $order = strtolower($this->input->get('order') ?: 'desc');
+        $order = in_array($order, ['asc', 'desc'], true) ? $order : 'desc';
 
         $this->load->library('pagination');
 
@@ -87,6 +98,13 @@ class Clientes extends MY_Controller
             $offset,
             $pessoa_fisica
         );
+        $this->data['sortOptions'] = $sortOptions;
+        $this->data['sortState'] = [
+            'sort' => $sort,
+            'order' => $order,
+            'defaultSort' => $defaultSort,
+            'defaultOrder' => 'desc',
+        ];
 
         $this->data['view'] = 'clientes/clientes';
 
@@ -106,6 +124,13 @@ class Clientes extends MY_Controller
         $pessoa_fisica = $this->input->get('pessoa_fisica');
 
         $clientes = $this->clientes_model->getGeographicData($pesquisa, $estado, $cidade, $tipo, $pessoa_fisica);
+
+        foreach ($clientes as $cliente) {
+            if (isset($cliente->nomeCliente)) {
+                $cliente->nomeCliente = html_entity_decode((string) $cliente->nomeCliente, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            }
+        }
+
         echo json_encode(['status' => 'success', 'data' => $clientes]);
     }
 

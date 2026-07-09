@@ -250,11 +250,42 @@
 
             <form method="get" action="<?= base_url() ?>index.php/clientes" style="margin-left: 0;">
                 <?php 
+                    $sortState = isset($sortState) && is_array($sortState) ? $sortState : [];
+                    $sort = $sortState['sort'] ?? 'idClientes';
+                    $order = $sortState['order'] ?? 'desc';
+                    $sortOptions = isset($sortOptions) && is_array($sortOptions)
+                        ? $sortOptions
+                        : [
+                            'idClientes' => 'Cod.',
+                            'nomeCliente' => 'Nome',
+                            'contato' => 'Contato',
+                            'documento' => 'CPF/CNPJ',
+                            'email' => 'Email',
+                        ];
                     $per_page_atual = (int) ($this->input->get('per_page') ?: $this->data['configuration']['per_page']);
                     $filtros_avancados_ativos = ($this->input->get('tipo') !== null && $this->input->get('tipo') !== '') || 
                                                 ($this->input->get('pessoa_fisica') !== null && $this->input->get('pessoa_fisica') !== '') || 
                                                 ($this->input->get('estado') !== null && $this->input->get('estado') !== '') || 
                                                 ($this->input->get('cidade') !== null && $this->input->get('cidade') !== '');
+                    $normalizeUtf8 = function ($value) {
+                        $value = (string) ($value ?? '');
+
+                        if ($value === '') {
+                            return '';
+                        }
+
+                        if (function_exists('mb_check_encoding') && !mb_check_encoding($value, 'UTF-8')) {
+                            $converted = @iconv('ISO-8859-1', 'UTF-8//TRANSLIT//IGNORE', $value);
+                            if ($converted !== false) {
+                                $value = $converted;
+                            }
+                        }
+
+                        return html_entity_decode($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                    };
+                    $e = function ($value) use ($normalizeUtf8) {
+                        return htmlspecialchars($normalizeUtf8($value), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+                    };
                 ?>
                 <div class="search-main-row" id="search-main-card" style="border-radius: <?= $filtros_avancados_ativos ? '10px 10px 0 0' : '10px' ?>;">
                     <input type="text" name="pesquisa" id="pesquisa" 
@@ -262,6 +293,8 @@
                            placeholder="Nome, Doc, Email ou Telefone..." 
                            aria-label="Pesquisar clientes"
                            value="<?= $this->input->get('pesquisa') ?>">
+                          <input type="hidden" name="sort" value="<?= htmlspecialchars($sort, ENT_QUOTES, 'UTF-8') ?>">
+                          <input type="hidden" name="order" value="<?= htmlspecialchars($order, ENT_QUOTES, 'UTF-8') ?>">
                     
                     <button type="submit" class="button btn btn-mini btn-warning search-button">
                         <span class="button__icon"><i class='bx bx-search-alt'></i></span>
@@ -351,10 +384,9 @@
                     <div class="widget-content nopadding">
                         <div class="table-responsive">
                         <?php
-                            $sort = $this->input->get('sort') ?: 'idClientes';
-                            $order = $this->input->get('order') ?: 'desc';
                             $nextOrder = $order == 'asc' ? 'desc' : 'asc';
                             $get_params = $this->input->get();
+                            unset($get_params['page']);
                             
                             $buildUrl = function($col) use ($nextOrder, $sort, $get_params) {
                                 $get_params['sort'] = $col;
@@ -372,14 +404,14 @@
                         <table id="tabela" class="table table-bordered table-sortable table-responsive">
                             <thead>
                                 <tr>
-                                    <th><a href="<?= $buildUrl('idClientes') ?>">Cod. <?= $iconSort('idClientes') ?></a></th>
-                                    <th><a href="<?= $buildUrl('nomeCliente') ?>">Nome <?= $iconSort('nomeCliente') ?></a></th>
-                                    <th><a href="<?= $buildUrl('contato') ?>">Contato <?= $iconSort('contato') ?></a></th>
-                                    <th><a href="<?= $buildUrl('documento') ?>">CPF/CNPJ <?= $iconSort('documento') ?></a></th>
+                                    <th><a href="<?= $buildUrl('idClientes') ?>"><?= $sortOptions['idClientes'] ?> <?= $iconSort('idClientes') ?></a></th>
+                                    <th><a href="<?= $buildUrl('nomeCliente') ?>"><?= $sortOptions['nomeCliente'] ?> <?= $iconSort('nomeCliente') ?></a></th>
+                                    <th><a href="<?= $buildUrl('contato') ?>"><?= $sortOptions['contato'] ?> <?= $iconSort('contato') ?></a></th>
+                                    <th><a href="<?= $buildUrl('documento') ?>"><?= $sortOptions['documento'] ?> <?= $iconSort('documento') ?></a></th>
                                     <th class="hide-on-mobile">Telefone</th>
                                     <th class="hide-on-mobile">Celular</th>
                                     <th class="show-on-mobile">Telefone/Celular</th>
-                                    <th><a href="<?= $buildUrl('email') ?>">Email <?= $iconSort('email') ?></a></th>
+                                    <th><a href="<?= $buildUrl('email') ?>"><?= $sortOptions['email'] ?> <?= $iconSort('email') ?></a></th>
                                     <th>Ações</th>
                                 </tr>
                             </thead>
@@ -391,14 +423,14 @@
                                         $telClean = preg_replace('/[^0-9]/', '', (string)$r->telefone);
                                         $celClean = preg_replace('/[^0-9]/', '', (string)$r->celular);
                                         
-                                        $telefoneLink = $r->telefone ? '<a href="tel:'.$telClean.'">'.htmlspecialchars($r->telefone).' <i class="fas fa-phone" style="font-size: 10px;"></i></a> <a href="https://wa.me/55'.$telClean.'" target="_blank"><i class="fab fa-whatsapp" style="color:#25d366"></i></a>' : '---';
-                                        $celularLink = $r->celular ? '<a href="https://wa.me/55'.$celClean.'" target="_blank">'.htmlspecialchars($r->celular).' <i class="fab fa-whatsapp" style="color:#25d366"></i></a>' : '---';
+                                        $telefoneLink = $r->telefone ? '<a href="tel:'.$telClean.'">'.$e($r->telefone).' <i class="fas fa-phone" style="font-size: 10px;"></i></a> <a href="https://wa.me/55'.$telClean.'" target="_blank"><i class="fab fa-whatsapp" style="color:#25d366"></i></a>' : '---';
+                                        $celularLink = $r->celular ? '<a href="https://wa.me/55'.$celClean.'" target="_blank">'.$e($r->celular).' <i class="fab fa-whatsapp" style="color:#25d366"></i></a>' : '---';
                                         
                                         $telExibir = $r->telefone ?: $r->celular;
                                         $whatsappLink = '---';
                                         if($telExibir) {
                                             $waNumber = preg_replace('/[^0-9]/', '', (string)$telExibir);
-                                            $whatsappLink = '<a href="tel:'.$waNumber.'">'.htmlspecialchars($telExibir).' <i class="fas fa-phone" style="font-size: 10px;"></i></a> <a href="https://wa.me/55'.$waNumber.'" target="_blank"><i class="fab fa-whatsapp" style="color:#25d366"></i></a>';
+                                            $whatsappLink = '<a href="tel:'.$waNumber.'">'.$e($telExibir).' <i class="fas fa-phone" style="font-size: 10px;"></i></a> <a href="https://wa.me/55'.$waNumber.'" target="_blank"><i class="fab fa-whatsapp" style="color:#25d366"></i></a>';
                                         }
 
                                         $ehFornecedor = $r->fornecedor == 1;
@@ -415,13 +447,13 @@
 
                                         echo '<tr>';
                                         echo '<td style="border-left: 4px solid '.$corBorda.';"><div style="display: flex; align-items: center; gap: 8px;"><span style="display: flex; gap: 4px; font-size: 13px;">' . $iconeTipo . ' ' . $iconeNatureza . '</span><span>' . $r->idClientes . '</span></div></td>';
-                                        echo '<td><a href="' . base_url() . 'index.php/clientes/visualizar/' . $r->idClientes . '">' . htmlspecialchars($r->nomeCliente ?? '') . '</a></td>';
-                                        echo '<td>' . htmlspecialchars($r->contato ?? '') . '</td>';
-                                        echo '<td>' . htmlspecialchars($r->documento ?? '') . '</td>';
+                                        echo '<td><a href="' . base_url() . 'index.php/clientes/visualizar/' . $r->idClientes . '">' . $e($r->nomeCliente ?? '') . '</a></td>';
+                                        echo '<td>' . $e($r->contato ?? '') . '</td>';
+                                        echo '<td>' . $e($r->documento ?? '') . '</td>';
                                         echo '<td class="hide-on-mobile">' . $telefoneLink . '</td>';
                                         echo '<td class="hide-on-mobile">' . $celularLink . '</td>';
                                         echo '<td class="show-on-mobile">' . $whatsappLink . '</td>';
-                                        echo '<td>' . ($r->email ? '<a href="mailto:'.$r->email.'">'.htmlspecialchars($r->email).' <i class="fas fa-envelope" style="font-size: 10px;"></i></a>' : '---') . '</td>';
+                                        echo '<td>' . ($r->email ? '<a href="mailto:'.htmlspecialchars($normalizeUtf8($r->email), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8').'">'.$e($r->email).' <i class="fas fa-envelope" style="font-size: 10px;"></i></a>' : '---') . '</td>';
                                         echo '<td>';
                                         if ($this->permission->checkPermission($this->session->userdata('permissao'), 'vCliente')) {
                                             echo '<a href="' . base_url() . 'index.php/clientes/visualizar/' . $r->idClientes . '" class="btn-nwe" title="Visualizar"><i class="bx bx-show bx-xs"></i></a>';
@@ -521,6 +553,15 @@
         return words[0] + ' ' + words[1];
     }
 
+    function escapeHtml(value) {
+        return String(value)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
     var isInitialMapLoad = true;
     function renderClientMarkers(data) {
 
@@ -549,8 +590,8 @@
                 var tipoCor = ehFornecedor ? 'color: #ff7800;' : 'color: #2b82cb;';
                 var tipoTxt = (ehFornecedor ? 'Fornecedor' : 'Cliente') + ' (' + (ehPF ? 'PF' : 'PJ') + ')';
                 
-                popupContent += `<a href="<?= base_url('index.php/clientes/visualizar/') ?>${c.idClientes}">${c.nomeCliente}</a> <small style="${tipoCor}">(${tipoTxt})</small><br>`;
-                if (index === 0) labelName = abbreviateName(c.nomeCliente);
+                popupContent += `<a href="<?= base_url('index.php/clientes/visualizar/') ?>${c.idClientes}">${escapeHtml(c.nomeCliente)}</a> <small style="${tipoCor}">(${tipoTxt})</small><br>`;
+                if (index === 0) labelName = abbreviateName(String(c.nomeCliente || ''));
                 
                 if (ehFornecedor) possuiFornecedor = true;
                 else possuiCliente = true;

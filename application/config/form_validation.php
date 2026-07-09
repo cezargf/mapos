@@ -172,7 +172,7 @@ $config = [
         [
             'field' => 'descricao',
             'label' => 'Descrição',
-            'rules' => 'trim|max_length[255]',
+            'rules' => 'trim',
         ],
         [
             'field' => 'modelo',

@@ -322,7 +322,7 @@
                                     <div class="control-group" style="max-width: 600px;">
                                         <label for="descricao" class="control-label">Descrição<span class="required">*</span></label>
                                         <div class="controls" style="display: flex; gap: 8px; height: 100%;">
-                                            <textarea id="descricao" name="descricao" maxlength="255" style="display: flex; flex: 1;" placeholder="Descrição do produto" aria-label="Descrição do produto" aria-required="true"><?php echo isset($result->descricao) ? $result->descricao : ''; ?></textarea>
+                                            <textarea id="descricao" name="descricao" style="display: flex; flex: 1;" placeholder="Descrição do produto" aria-label="Descrição do produto" aria-required="true"><?php echo isset($result->descricao) ? $result->descricao : ''; ?></textarea>
                                         </div>
                                     </div>
                                     <div class="control-group" style="max-width: 600px;">

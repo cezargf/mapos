@@ -32,8 +32,19 @@ class Produtos extends MY_Controller
         $pesquisa = $this->input->get('pesquisa');
         $de = $this->input->get('de');
         $ate = $this->input->get('ate');
-        $sort = $this->input->get('sort') ?: 'idProdutos';
-        $order = $this->input->get('order') ?: 'desc';
+        $sortOptions = [
+            'idProdutos' => 'Cod.',
+            'codDeBarra' => 'Cod. Barra',
+            'nome' => 'Nome',
+            'estoque' => 'Estoque',
+            'precoVenda' => 'Preço',
+        ];
+        $defaultSort = 'idProdutos';
+        $allowedSortColumns = array_keys($sortOptions);
+        $sort = $this->input->get('sort') ?: $defaultSort;
+        $sort = in_array($sort, $allowedSortColumns, true) ? $sort : $defaultSort;
+        $order = strtolower($this->input->get('order') ?: 'desc');
+        $order = in_array($order, ['asc', 'desc'], true) ? $order : 'desc';
         $config = $this->data['configuration'];
         $perPage = (int) $this->input->get('per_page');
 
@@ -106,6 +117,13 @@ class Produtos extends MY_Controller
         $this->db->limit($config['per_page'], $offset);
         
         $this->data['results'] = $this->db->get()->result();
+        $this->data['sortOptions'] = $sortOptions;
+        $this->data['sortState'] = [
+            'sort' => $sort,
+            'order' => $order,
+            'defaultSort' => $defaultSort,
+            'defaultOrder' => 'desc',
+        ];
 
         $this->data['view'] = 'produtos/produtos';
         return $this->layout();

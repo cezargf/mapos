@@ -2,17 +2,12 @@
   .dataTables_length {
       margin-top: 20px;
   }
-  .search-area {
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-bottom: 15px;
+  .dataTables_length select {
+      width: 70px;
+      margin-right: 5px;
   }
-  .search-button {
-      height: 30px;
-      margin-bottom: 0;
+  .search-button .button__text2 {
+      display: inherit;
   }
   /* Estilização para ordenação da tabela */
   .table-sortable th {
@@ -41,6 +36,7 @@
   }
   @media (max-width: 767px) {
       .widget-content { width: 100%; padding: 0 !important; }
+      .search-button .button__text2 { display: none; }
   }
 </style>
 
@@ -72,13 +68,30 @@
             <?php endif; ?>
             
             <div class="span12" style="margin-left: 0;">
-                <form method="get" action="<?= base_url() ?>index.php/produtos/gerenciar" class="search-area" style="justify-content: flex-start;">
+                <form method="get" action="<?= base_url() ?>index.php/produtos/gerenciar" class="search-area" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-start; margin-bottom: 15px; gap: 10px;">
+                    <?php
+                        $sortState = isset($sortState) && is_array($sortState) ? $sortState : [];
+                        $sort = $sortState['sort'] ?? 'idProdutos';
+                        $order = $sortState['order'] ?? 'desc';
+                        $sortOptions = isset($sortOptions) && is_array($sortOptions)
+                            ? $sortOptions
+                            : [
+                                'idProdutos' => 'Cod.',
+                                'codDeBarra' => 'Cod. Barra',
+                                'nome' => 'Nome',
+                                'estoque' => 'Estoque',
+                                'precoVenda' => 'Preço',
+                            ];
+                    ?>
                     <input type="text" name="pesquisa" id="pesquisa" 
-                           placeholder="Buscar por Código de Barras ou Descrição..." 
-                           style="width: 300px; margin-bottom: 0;"
+                           placeholder="Buscar por Código de Barras ou Descrição..."
+                           aria-label="Campo de pesquisa para produtos"
+                           style="flex: 1; max-width: 300px; margin-bottom: 0;"
                            value="<?= $this->input->get('pesquisa') ?>">
+                    <input type="hidden" name="sort" value="<?= htmlspecialchars($sort, ENT_QUOTES, 'UTF-8') ?>">
+                    <input type="hidden" name="order" value="<?= htmlspecialchars($order, ENT_QUOTES, 'UTF-8') ?>">
                     
-                    <button class="button btn btn-mini btn-warning search-button">
+                    <button class="button btn btn-mini btn-warning search-button" style="margin: 0;" aria-label="Pesquisar Produtos">
                         <span class="button__icon"><i class='bx bx-search-alt'></i></span>
                         <span class="button__text2">Pesquisar</span>
                     </button>
@@ -102,8 +115,6 @@
         <div class="widget-content nopadding">
             <div class="table-responsive">
                 <?php
-                    $sort = $this->input->get('sort') ?: 'idProdutos';
-                    $order = $this->input->get('order') ?: 'desc';
                     $nextOrder = $order == 'asc' ? 'desc' : 'asc';
                     $get_params = $this->input->get();
                     unset($get_params['page']);
@@ -124,12 +135,10 @@
                 <table id="tabela" class="table table-bordered table-sortable">
                     <thead>
                         <tr>
-                            <th><a href="<?= $buildUrl('idProdutos') ?>">Cod. <?= $iconSort('idProdutos') ?></a></th>
+                            <?php foreach ($sortOptions as $column => $label) : ?>
+                                <th><a href="<?= $buildUrl($column) ?>"><?= $label ?> <?= $iconSort($column) ?></a></th>
+                            <?php endforeach; ?>
                             <th>Foto</th>
-                            <th><a href="<?= $buildUrl('codDeBarra') ?>">Cod. Barra <?= $iconSort('codDeBarra') ?></a></th>
-                            <th><a href="<?= $buildUrl('nome') ?>">Nome <?= $iconSort('nome') ?></a></th>
-                            <th><a href="<?= $buildUrl('estoque') ?>">Estoque <?= $iconSort('estoque') ?></a></th>
-                            <th><a href="<?= $buildUrl('precoVenda') ?>">Preço <?= $iconSort('precoVenda') ?></a></th>
                             <th>Ações</th>
                         </tr>
                     </thead>

@@ -228,7 +228,7 @@ $(document).ready(function () {
         const fieldsToReset = [
             'input[name="nome"]', 'input[name="nome_fantasia"]', 'input[name="nomeCliente"]', 'input[name="cep"]', 
             'input[name="logradouro"]', 'input[name="rua"]', 'input[name="numero"]', 
-            'input[name="bairro"]', 'input[name="email"]', 'input[name="telefone"]'
+            'input[name="bairro"]', 'input[name="email"]', 'input[name="telefone"]', 'input[name="tipo"]'
         ].join(', ');
         container.find(fieldsToReset).val('...');
 
@@ -266,6 +266,7 @@ $(document).ready(function () {
                 // --- Campos específicos ---
                 container.find('[name="situacao"]').val(data.situacao);
                 container.find('[name="porte"]').val(capital_letter(data.porte));
+                container.find('[name="tipo"]').val((data.tipo || '').toUpperCase());
                 container.find('[name="data_abertura"]').val(data.abertura).mask("00/00/0000");
                 container.find('[name="data_situacao"]').val(data.data_situacao).mask("00/00/0000");
                 container.find('[name="motivo_situacao"]').val(data.motivo_situacao);

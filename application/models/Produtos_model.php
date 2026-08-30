@@ -73,6 +73,42 @@ class Produtos_model extends CI_Model
 
     public function updateEstoque($produto, $quantidade, $operacao = '-')
     {
+        if (is_array($produto)) {
+            if (empty($produto)) {
+                return true;
+            }
+
+            // Group quantities by product ID to prevent issues with duplicate items in the same OS
+            $groupedProducts = [];
+            foreach ($produto as $p) {
+                $produto_id = isset($p->produtos_id) ? $p->produtos_id : $p['produtos_id'];
+                $qtd = isset($p->quantidade) ? $p->quantidade : $p['quantidade'];
+
+                if (isset($groupedProducts[$produto_id])) {
+                    $groupedProducts[$produto_id] += $qtd;
+                } else {
+                    $groupedProducts[$produto_id] = $qtd;
+                }
+            }
+
+            $cases = '';
+            $ids = [];
+            $params = [];
+
+            foreach ($groupedProducts as $produto_id => $qtd) {
+                $cases .= "WHEN ? THEN ? ";
+                $params[] = $produto_id;
+                $params[] = $qtd;
+                $ids[] = $produto_id;
+            }
+
+            $placeholders = implode(',', array_fill(0, count($ids), '?'));
+            $sql = "UPDATE produtos SET estoque = estoque {$operacao} (CASE idProdutos {$cases} END) WHERE idProdutos IN ({$placeholders})";
+
+            $params = array_merge($params, $ids);
+            return $this->db->query($sql, $params);
+        }
+
         $sql = "UPDATE produtos set estoque = estoque $operacao ? WHERE idProdutos = ?";
 
         return $this->db->query($sql, [$quantidade, $produto]);

@@ -1044,8 +1044,8 @@ class OsController extends REST_Controller
         if ($produtos = $this->os_model->getProdutos($id)) {
             $this->load->model('produtos_model');
             if ($this->getConfig('control_estoque')) {
+                $this->produtos_model->updateEstoqueBatch($produtos, '+');
                 foreach ($produtos as $p) {
-                    $this->produtos_model->updateEstoque($p->produtos_id, $p->quantidade, '+');
                     log_info('ESTOQUE: Produto id ' . $p->produtos_id . ' voltou ao estoque. Quantidade: ' . $p->quantidade . '. Motivo: Cancelamento/Exclusão');
                 }
             }
@@ -1057,8 +1057,8 @@ class OsController extends REST_Controller
         if ($produtos = $this->os_model->getProdutos($id)) {
             $this->load->model('produtos_model');
             if ($this->getConfig('control_estoque')) {
+                $this->produtos_model->updateEstoqueBatch($produtos, '-');
                 foreach ($produtos as $p) {
-                    $this->produtos_model->updateEstoque($p->produtos_id, $p->quantidade, '-');
                     log_info('ESTOQUE: Produto id ' . $p->produtos_id . ' baixa do estoque. Quantidade: ' . $p->quantidade . '. Motivo: Mudou status que já estava Cancelado para outro');
                 }
             }

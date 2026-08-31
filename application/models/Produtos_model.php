@@ -77,4 +77,47 @@ class Produtos_model extends CI_Model
 
         return $this->db->query($sql, [$quantidade, $produto]);
     }
+
+    public function updateEstoqueBatch($produtos, $operacao = '-')
+    {
+        if (empty($produtos)) {
+            return true;
+        }
+
+        $aggregated = [];
+
+        foreach ($produtos as $p) {
+            $id = isset($p->produtos_id) ? $p->produtos_id : (isset($p['produtos_id']) ? $p['produtos_id'] : null);
+            $qtd = isset($p->quantidade) ? $p->quantidade : (isset($p['quantidade']) ? $p['quantidade'] : null);
+
+            if ($id === null || $qtd === null) {
+                continue;
+            }
+
+            if (!isset($aggregated[$id])) {
+                $aggregated[$id] = 0;
+            }
+            $aggregated[$id] += $qtd;
+        }
+
+        if (empty($aggregated)) {
+            return true;
+        }
+
+        $ids = [];
+        $cases = [];
+        $params = [];
+
+        foreach ($aggregated as $id => $qtd) {
+            $ids[] = $id;
+            $cases[] = "WHEN idProdutos = ? THEN estoque $operacao ?";
+            $params[] = $id;
+            $params[] = $qtd;
+        }
+
+        $sql = "UPDATE produtos SET estoque = CASE " . implode(" ", $cases) . " ELSE estoque END WHERE idProdutos IN (" . implode(",", array_fill(0, count($ids), "?")) . ")";
+        $params = array_merge($params, $ids);
+
+        return $this->db->query($sql, $params);
+    }
 }

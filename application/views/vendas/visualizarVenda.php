@@ -5,7 +5,7 @@
             <div class="widget-title" style="margin: 10px 0 0">
                     <div class="buttons">
                         <?php
-                        $editavel = $this->vendas_model->isEditable($result->idVendas);
+                        $editavel = $result->faturado ? $configuration['control_edit_vendas'] == '1' : true;
 if (($result->faturado != 1 || $editavel) && $this->permission->checkPermission($this->session->userdata('permissao'), 'eVenda')): ?>
                             <a title="Editar Venda" class="button btn btn-mini btn-success" href="<?php echo base_url() . 'index.php/vendas/editar/' . $result->idVendas; ?>">
                                 <span class="button__icon"><i class="bx bx-edit"></i></span>

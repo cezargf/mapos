@@ -151,7 +151,7 @@
                     <a href="<?php echo base_url(); ?>index.php/clientes/adicionar" class="card tip-top" title="Add Clientes e Fornecedores">
                         <div><i class='bx bxs-group iconBx'></i></div>
                         <div>
-                            <div class="cardName2"><?= $this->db->count_all('clientes'); ?></div>
+                            <div class="cardName2"><?= $count_clientes ?></div>
                             <div class="cardName">Clientes</div>
                         </div>
                     </a>
@@ -159,7 +159,7 @@
                     <a href="<?php echo base_url(); ?>index.php/produtos/adicionar" class="card tip-top" title="Adicionar Produtos">
                         <div><i class='bx bxs-package iconBx2'></i></div>
                         <div>
-                            <div class="cardName2"><?= $this->db->count_all('produtos'); ?></div>
+                            <div class="cardName2"><?= $count_produtos ?></div>
                             <div class="cardName">Produtos</div>
                         </div>
                     </a>
@@ -167,7 +167,7 @@
                     <a href="<?php echo base_url() ?>index.php/servicos/adicionar" class="card tip-top" title="Adicionar serviços">
                         <div><i class='bx bxs-stopwatch iconBx3'></i></div>
                         <div>
-                            <div class="cardName2"><?= $this->db->count_all('servicos'); ?></div>
+                            <div class="cardName2"><?= $count_servicos ?></div>
                             <div class="cardName">Serviços</div>
                         </div>
                     </a>
@@ -175,7 +175,7 @@
                     <a href="<?php echo base_url(); ?>index.php/os/adicionar" class="card tip-top" title="Adicionar OS">
                         <div><i class='bx bxs-spreadsheet iconBx4'></i></div>
                         <div>
-                            <div class="cardName2"><?= $this->db->count_all('os'); ?></div>
+                            <div class="cardName2"><?= $count_os ?></div>
                             <div class="cardName">Ordens</div>
                         </div>
                     </a>
@@ -183,7 +183,7 @@
                     <a href="<?php echo base_url(); ?>index.php/garantias" class="card tip-top" title="Adicionar garantia">
                         <div><i class='bx bxs-receipt iconBx6'></i></div>
                         <div>
-                            <div class="cardName2"><?= $this->db->count_all('garantias'); ?></div>
+                            <div class="cardName2"><?= $count_garantias ?></div>
                             <div class="cardName">Garantias</div>
                         </div>
                     </a>
@@ -191,7 +191,7 @@
                     <a href="<?php echo base_url() ?>index.php/vendas/adicionar" class="card tip-top" title="Adicionar Vendas">
                         <div><i class='bx bxs-cart-alt iconBx5'></i></div>
                         <div>
-                            <div class="cardName2"><?= $this->db->count_all('vendas'); ?></div>
+                            <div class="cardName2"><?= $count_vendas ?></div>
                             <div class="cardName">Vendas</div>
                         </div>
                     </a>

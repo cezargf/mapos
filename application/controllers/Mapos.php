@@ -31,6 +31,14 @@ class Mapos extends MY_Controller
         $this->data['menuPainel'] = 'Painel';
         $this->data['view'] = 'mapos/painel';
 
+        // Count queries for painel
+        $this->data['count_clientes'] = $this->db->count_all('clientes');
+        $this->data['count_produtos'] = $this->db->count_all('produtos');
+        $this->data['count_servicos'] = $this->db->count_all('servicos');
+        $this->data['count_os'] = $this->db->count_all('os');
+        $this->data['count_garantias'] = $this->db->count_all('garantias');
+        $this->data['count_vendas'] = $this->db->count_all('vendas');
+
         return $this->layout();
     }
 

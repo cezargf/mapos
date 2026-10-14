@@ -143,11 +143,16 @@ class Clientes_model extends CI_Model
     public function removeClientVendas($vendas)
     {
         try {
+            $vendas_ids = [];
             foreach ($vendas as $v) {
-                $this->db->where('vendas_id', $v->idVendas);
+                $vendas_ids[] = $v->idVendas;
+            }
+
+            if (!empty($vendas_ids)) {
+                $this->db->where_in('vendas_id', $vendas_ids);
                 $this->db->delete('itens_de_vendas');
 
-                $this->db->where('idVendas', $v->idVendas);
+                $this->db->where_in('idVendas', $vendas_ids);
                 $this->db->delete('vendas');
             }
         } catch (Exception $e) {

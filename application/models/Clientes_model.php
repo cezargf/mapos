@@ -103,17 +103,24 @@ class Clientes_model extends CI_Model
      */
     public function removeClientOs($os)
     {
+        if (empty($os)) {
+            return true;
+        }
+
+        $osIds = [];
+        foreach ($os as $o) {
+            $osIds[] = $o->idOs;
+        }
+
         try {
-            foreach ($os as $o) {
-                $this->db->where('os_id', $o->idOs);
-                $this->db->delete('servicos_os');
+            $this->db->where_in('os_id', $osIds);
+            $this->db->delete('servicos_os');
 
-                $this->db->where('os_id', $o->idOs);
-                $this->db->delete('produtos_os');
+            $this->db->where_in('os_id', $osIds);
+            $this->db->delete('produtos_os');
 
-                $this->db->where('idOs', $o->idOs);
-                $this->db->delete('os');
-            }
+            $this->db->where_in('idOs', $osIds);
+            $this->db->delete('os');
         } catch (Exception $e) {
             return false;
         }
